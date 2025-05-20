@@ -32,7 +32,11 @@ public class CardScript : MonoBehaviour
     {
 
         Debug.Log(stats.ShowId());
-        GameManagerScript.Instance.IsMatch(this);
+        if (!GameManagerScript.Instance.IsMatch(this))
+        {
+            Debug.Log("Game Over");
+        }
+        ;
     }
 
 }

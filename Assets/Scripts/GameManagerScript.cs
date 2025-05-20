@@ -8,6 +8,12 @@ using System.Collections;
 public class GameManagerScript : MonoBehaviour
 {
     [SerializeField] private CardScript card;
+
+    [SerializeField] private GameObject startPosition;
+
+    private GameMode gameMode;
+
+    private Basic CurrentGameMode;
     
     public List<CardScript> currentCardId = new();
 
@@ -25,20 +31,37 @@ public class GameManagerScript : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
+     void Start()
+    {
+        gameMode = new();
+        CurrentGameMode = gameMode.GameModeSelector();
+        InitCards();
+
+
+
+    }
+
+
     public bool IsMatch(CardScript cardId)
     {
         Debug.Log(cardId.ShowStats().ShowId());
         currentCardId.Add(cardId);
         cardId.GetComponent<BoxCollider>().enabled = false;
         if (currentCardId.Count == 2) {
-            if (currentCardId.All(x => x.ShowStats().ShowId() == cardId.ShowStats().ShowId())) Debug.Log("Same Cards!");
-            else Debug.Log("Didnt Match!");
+            if (currentCardId.All(x => x.ShowStats().ShowId() == cardId.ShowStats().ShowId()))
+            {
+                Debug.Log("Same Cards!"); 
+                gameMode.gameMode.CardsInGame--;
+                StartCoroutine(EnableCards());
+
+            }
+            else { Debug.Log("Didnt Match!"); gameMode.gameMode.mistakes--; }
 
             StartCoroutine(ResetCards());
                        
-            return true;
+            
         }
-        return false;
+        return gameMode.gameMode.IsContinueValid();
         
     }
 
@@ -50,22 +73,36 @@ public class GameManagerScript : MonoBehaviour
 
     }
 
-    void Start()
+    private IEnumerator EnableCards()
     {
-        for (int i = 0; i < 5; i++)
+        yield return new WaitForSeconds(1f);
+        foreach (CardScript card in currentCardId) { Destroy(card); }
+        Debug.Log("Cards Destroyed");
+        currentCardId.Clear();
+
+    }
+
+   
+    private void InitCards()
+    {
+        for (int i = 0; i < CurrentGameMode.CardsInGame; i++)
         {
-            for (int j = 0; j < 2; j++)
+            for (int j = 0; j < CurrentGameMode.CardsToMatch; j++)
             {
-                CardScript newCard = Instantiate(card);
+                CardScript newCard = Instantiate(card, startPosition.transform.position+ new Vector3(3f,0f,0f), card.transform.rotation);
                 newCard.ChangeMaterial(i);
                 newCard.ShowStats().NewId(i);
                 Debug.Log(newCard.ShowStats().ShowId());
+                startPosition.transform.position = newCard.transform.position;   
             }
             
 
 
         }
+
     }
 
-   
+    
+
+    delegate void Message();
 }
