@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using UnityEngine;
 
@@ -18,15 +19,17 @@ public class CardScript : MonoBehaviour
     
     public CardStats ShowStats()=> stats;
     public List<Material> ShowMaterial() => _materials;
+
     public void ChangeMaterial(int id)
     {
-        if(id<_materials.Count)
-        gameObject.GetComponent<Renderer>().material = _materials[id];
-        else
-        {
-            throw new System.Exception("Material count Error");
-        }
+        Debug.Log(id + " " + GameManagerScript.Instance.gameMode.gameMode.CardsInGame);
+        int materialID = (id + _materials.Count) % _materials.Count;
+
+        gameObject.GetComponent<Renderer>().material = _materials[materialID];
+        ShowStats().NewId(materialID);
+        
     }
+
 
     private void OnMouseDown()
     {

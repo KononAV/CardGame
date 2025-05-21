@@ -12,7 +12,7 @@ public class GameMode : MonoBehaviour
 
     private Modes mode = Modes.Basic;
     public Basic gameMode;
-    private int basicCardsCount = 5;
+    private int basicCardsCount = 10;
     private int basicCardsToMatchCount = 2;
 
     public Basic GameModeSelector()

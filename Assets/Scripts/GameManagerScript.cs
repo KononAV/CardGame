@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using System.Collections;
+using Unity.VisualScripting;
 
 public class GameManagerScript : MonoBehaviour
 {
@@ -11,11 +12,14 @@ public class GameManagerScript : MonoBehaviour
 
     [SerializeField] private GameObject startPosition;
 
-    private GameMode gameMode;
+    public GameMode gameMode;
 
     private Basic CurrentGameMode;
+
+    [SerializeField]private Camera MainCamera;
+    [SerializeField] private GameObject GameBoard;
     
-    public List<CardScript> currentCardId = new();
+    private List<CardScript> currentCardId = new();
 
     public static GameManagerScript Instance { get; private set; }
 
@@ -33,9 +37,17 @@ public class GameManagerScript : MonoBehaviour
 
      void Start()
     {
+        
         gameMode = new();
         CurrentGameMode = gameMode.GameModeSelector();
-        InitCards();
+
+        if (MainCamera)
+        {
+            Vector3 cameraCenter =  MainCamera.GetComponent<Camera>().transform.position;
+            Debug.Log(cameraCenter.x+"Camera x");
+            Vector2 cameraSize = new Vector2 (cameraCenter.x, cameraCenter.z);
+            //InitCards(cameraSize);
+        }
 
 
 
@@ -83,17 +95,34 @@ public class GameManagerScript : MonoBehaviour
     }
 
    
-    private void InitCards()
+    private void InitCards(Vector2 cameraCenter)
     {
+        Vector3 gameBoardVec = Vector3.one;
+        if (GameBoard)
+        {
+            Vector3 boardVec = GameBoard.transform.position;
+            gameBoardVec = new Vector3(boardVec.x, .1f, boardVec.z);
+
+           
+        }
+
+        Rect safeArea = Screen.safeArea;
+        Vector3 StartPos = new Vector3(safeArea.position.normalized.x, .1f, safeArea.position.normalized.y);
+
+        
+
         for (int i = 0; i < CurrentGameMode.CardsInGame; i++)
         {
             for (int j = 0; j < CurrentGameMode.CardsToMatch; j++)
             {
-                CardScript newCard = Instantiate(card, startPosition.transform.position+ new Vector3(3f,0f,0f), card.transform.rotation);
+                CardScript newCard = Instantiate(
+                    card,
+                   StartPos, 
+                    card.transform.rotation);
+                Debug.Log(newCard.transform.position);
                 newCard.ChangeMaterial(i);
-                newCard.ShowStats().NewId(i);
                 Debug.Log(newCard.ShowStats().ShowId());
-                startPosition.transform.position = newCard.transform.position;   
+                //startPosition.transform.position = newCard.transform.position;   
             }
             
 
@@ -102,7 +131,10 @@ public class GameManagerScript : MonoBehaviour
 
     }
 
-    
+    private void CardPlaces()
+    {
+
+    }
 
     delegate void Message();
 }
