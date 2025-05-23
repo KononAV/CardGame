@@ -22,7 +22,6 @@ public class CardScript : MonoBehaviour
 
     public void ChangeMaterial(int id)
     {
-        Debug.Log(id + " " + GameManagerScript.Instance.gameMode.gameMode.CardsInGame);
         int materialID = (id + _materials.Count) % _materials.Count;
 
         gameObject.GetComponent<Renderer>().material = _materials[materialID];
@@ -34,7 +33,7 @@ public class CardScript : MonoBehaviour
     private void OnMouseDown()
     {
 
-        Debug.Log(stats.ShowId());
+        //Debug.Log(stats.ShowId());
         if (!GameManagerScript.Instance.IsMatch(this))
         {
             Debug.Log("Game Over");

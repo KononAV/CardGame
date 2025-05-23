@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 enum Modes
@@ -12,7 +13,7 @@ public class GameMode : MonoBehaviour
 
     private Modes mode = Modes.Basic;
     public Basic gameMode;
-    private int basicCardsCount = 10;
+    private int basicCardsCount = 12;
     private int basicCardsToMatchCount = 2;
 
     public Basic GameModeSelector()
@@ -25,6 +26,7 @@ public class GameMode : MonoBehaviour
         };
         return gameMode;
     }
+
 
 }
 
@@ -45,7 +47,8 @@ public class Basic
 
     public virtual bool IsContinueValid()
     {
-        return CardsInGame > 0;
+        Debug.Log(CardsInGame+ "cards in game");
+        return CardsInGame >= CardsToMatch;
     }
 
 }

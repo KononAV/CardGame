@@ -1,10 +1,12 @@
 using NUnit.Framework;
-using System.Diagnostics.CodeAnalysis;
-using System.Collections.Generic;
-using UnityEngine;
-using System.Linq;
+using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using System.Threading;
 using Unity.VisualScripting;
+using UnityEngine;
 
 public class GameManagerScript : MonoBehaviour
 {
@@ -46,24 +48,44 @@ public class GameManagerScript : MonoBehaviour
             Vector3 cameraCenter =  MainCamera.GetComponent<Camera>().transform.position;
             Debug.Log(cameraCenter.x+"Camera x");
             Vector2 cameraSize = new Vector2 (cameraCenter.x, cameraCenter.z);
+            CreateCards(TableGrid.SpiralMatrixCards(6, 4), card.ShowMaterial());
+
             //InitCards(cameraSize);
         }
 
+    }
 
+    private void CreateCards(List<Vector3> vectorArray, List<Material> materials)
+    {
+        Debug.Log(vectorArray.Count+ "vector");
+        if (vectorArray.Count < 2) throw new ArgumentException("Cards count <2");
 
+        for(int i = 0; i< vectorArray.Count/2-1; i++)
+        {
+            for (int j = 0; j < gameMode.gameMode.CardsToMatch; j++)
+            {
+                Debug.Log(i);
+                CardScript newCard = Instantiate(card, vectorArray[i* gameMode.gameMode.CardsToMatch+j], card.transform.rotation);
+                newCard.ChangeMaterial(i);
+            }
+            //Thread.Sleep(2000);
+
+        }
     }
 
 
     public bool IsMatch(CardScript cardId)
     {
-        Debug.Log(cardId.ShowStats().ShowId());
+        //Debug.Log(cardId.ShowStats().ShowId());
+
         currentCardId.Add(cardId);
         cardId.GetComponent<BoxCollider>().enabled = false;
-        if (currentCardId.Count == 2) {
+        if (currentCardId.Count == gameMode.gameMode.CardsToMatch) {
             if (currentCardId.All(x => x.ShowStats().ShowId() == cardId.ShowStats().ShowId()))
             {
                 Debug.Log("Same Cards!"); 
-                gameMode.gameMode.CardsInGame--;
+                gameMode.gameMode.CardsInGame-= gameMode.gameMode.CardsToMatch;
+               
                 StartCoroutine(EnableCards());
 
             }
@@ -89,6 +111,7 @@ public class GameManagerScript : MonoBehaviour
     {
         yield return new WaitForSeconds(1f);
         foreach (CardScript card in currentCardId) { Destroy(card); }
+        
         Debug.Log("Cards Destroyed");
         currentCardId.Clear();
 
@@ -131,10 +154,6 @@ public class GameManagerScript : MonoBehaviour
 
     }
 
-    private void CardPlaces()
-    {
-
-    }
 
     delegate void Message();
 }

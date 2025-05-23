@@ -1,83 +1,117 @@
-using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class TableGrid : MonoBehaviour
 {
-    [SerializeField]CardScript cardScript;
-    public Vector2 Size = new Vector2(1.5f,1);
+    [SerializeField] static CardScript cardScript;
 
-    [SerializeField] private GameObject Table;
-    [SerializeField] private CardScript cardExamp;
+    private static Rect safeArea;
 
 
-    private List<Vector3> vectorList = new();
+    private static List<Vector3> vectorArray;
 
-
-    enum MatrixSide
+    public static List<Vector3> SpiralMatrixCards(int sizeX, int sizeY)
     {
-        LeftUp,
-        RightUp,
-        LeftDown,
-        RightDown,
-    }
+        vectorArray = new List<Vector3>();
+        //vectorArray = new Vector3[sizeX * sizeY];
+        float spacing = 1.5f; 
+        float verticalScale = 1.2f;
 
-    private void CardMatrix(MatrixSide side)
-    {
-        Rect safeArea = Screen.safeArea;
-        Vector3 StartPos = new Vector3(safeArea.position.normalized.x, .1f, safeArea.position.normalized.y);
+        Vector3 gridCenter = new Vector3(
+            safeArea.position.normalized.x,
+            0.1f,
+            safeArea.position.normalized.y
+        );
 
-        (int x, int y) vectors = side switch
+        Vector3 newStartPos = gridCenter - new Vector3(
+            ((sizeX - 1) * 0.5f) * spacing,
+            0f,
+            ((sizeY - 1) * 0.5f) * spacing * verticalScale
+        );
+       
+        int total = sizeX * sizeY;
+        int count = 1;
+
+        int x = sizeX / 2;
+        int y = sizeY / 2;
+        if (sizeX % 2 == 0) x--;
+        if (sizeY % 2 == 0) y--;
+
+        int[][] directions = new int[][]
         {
-            MatrixSide.LeftUp => (-1, 1),
-            MatrixSide.RightUp => (1, 1),
-            MatrixSide.RightDown => (1, -1),
-            MatrixSide.LeftDown => (-1, -1),
+     new int[]{1, 0},
+     new int[]{0, 1},
+     new int[]{-1, 0},
+     new int[]{0, -1}
         };
 
-        for (int x = 0; x < 7; x++)
+        vectorArray.Add(newStartPos + new Vector3(x * spacing, 0, y * spacing * verticalScale));
+        count++;
+        int steps = 1;
+        while (count <= total)
         {
-            for (int y = 0; y < 3; y++)
+            for (int d = 0; d < 4; d++)
             {
-                float spacing = 1.5f; 
-                Vector3 offsetup = new Vector3(x*vectors.x * spacing, 0, y*vectors.y * spacing * 1.2f);
+                for (int s = 0; s < steps; s++)
+                {
+                    x += directions[d][0];
+                    y += directions[d][1];
 
-               
+                    if (x >= 0 && x < sizeX && y >= 0 && y < sizeY)
+                    {
+                        count++;
+                        vectorArray.Add(newStartPos + new Vector3(x * spacing, 0, y * spacing * verticalScale));
 
-                Instantiate(cardExamp, StartPos + offsetup, cardExamp.transform.rotation);
+                        //Instantiate(cardExamp, newStartPos + new Vector3(x * spacing, 0, y * spacing * verticalScale), cardExamp.transform.rotation);
+
+                        if (count > total) break;
+                    }
+                }
+                if (d % 2 == 1) steps++;
             }
         }
+        
+
+        //vectorArray[y * sizeX + x] = newStartPos + new Vector3(1 * spacing, 0, 1 * spacing * verticalScale);
+        return vectorArray;
+
     }
 
 
 
-    public int[][] GetMatrix(int sizeX, int sizeY)
+   /* private void OnDrawGizmos()
     {
-
+        int sizeY = 4;
+        int sizeX = 3;
         Rect safeArea = Screen.safeArea;
-        Vector3 StartPos = new Vector3(safeArea.position.normalized.x, .1f, safeArea.position.normalized.y);
 
         float spacing = 1.5f;
+        float verticalScale = 1.2f;
 
-        int[][] matrix = new int[sizeY][];
-        for (int i = 0; i < sizeY; i++)
-        {
-            matrix[i] = new int[sizeX];
-        }
+        Vector3 gridCenter = new Vector3(
+            safeArea.position.normalized.x,
+            0.1f,
+            safeArea.position.normalized.y
+        );
+
+        Vector3 newStartPos = gridCenter - new Vector3(
+            ((sizeX - 1) * 0.5f) * spacing,
+            0f,
+            ((sizeY - 1) * 0.5f) * spacing * verticalScale
+        );
 
         int total = sizeX * sizeY;
         int count = 1;
 
-
         int x = sizeX / 2;
         int y = sizeY / 2;
-
         if (sizeX % 2 == 0) x--;
         if (sizeY % 2 == 0) y--;
 
-        matrix[y][x] = count++;
-
+        count++;
 
         int[][] directions = new int[][]
         {
@@ -86,158 +120,53 @@ public class TableGrid : MonoBehaviour
             new int[]{-1, 0},
             new int[]{0, -1}
         };
-
-        int steps = 1;
-        while (count <= total)
-        {
-            for (int d = 0; d < 4; d++)
-            {
-                for (int s = 0; s < steps; s++)
-                {
-                    x += directions[d][0];
-                    y += directions[d][1];
-
-                    if (x >= 0 && x < sizeX && y >= 0 && y < sizeY)
-                    {
-                        matrix[y][x] = count++;
-                        if (count > total) break;
-                    }
-                }
-                if (d % 2 == 1) steps++;
-            }
-        }
-
-        return matrix;
-    }
-
-
-        private void OnDrawGizmos()
-        {
-        int sizeY = 4;
-        int sizeX = 5;
-        float centerDel = 0;
-float spacing = 1.5f;
-        Rect safeArea = Screen.safeArea;
-        Vector3 StartPos = new Vector3(safeArea.position.normalized.x, .1f, safeArea.position.normalized.y);
-
-        if(sizeX%2==0)centerDel = .5f;
-        //else centerDel = 1/spacing;
-
-        Vector3 newStartPos = new Vector3(
-            safeArea.position.normalized.x-spacing*((float)Math.Round((double)sizeX/2-1) )- spacing* centerDel, 
-            .1f, 
-            safeArea.position.normalized.y - (spacing *1.2f)* (float)Math.Round((double)sizeY / 2-1)-(spacing*1.2f/ 2) );
-
-        //Debug.Log(StartPos);
-
-
-
-        int[][] matrix = new int[sizeY][];
-        for (int i = 0; i < sizeY; i++)
-        {
-            matrix[i] = new int[sizeX];
-        }
-
-        int total = sizeX * sizeY;
-        int count = 1;
-
-        int x = sizeX / 2;
-        int y = sizeY / 2;
-
-        if (sizeX % 2 == 0) x--;
-        if (sizeY % 2 == 0) y--;
-
-        matrix[y][x] = count++;
-
-
-        int[][] directions = new int[][]
-        {
-            new int[]{1, 0},
-            new int[]{0, 1},
-            new int[]{-1, 0},
-            new int[]{0, -1}
-        };
-
-        int steps = 1;
-        while (count <= total)
-        {
-            for (int d = 0; d < 4; d++)
-            {
-                for (int s = 0; s < steps; s++)
-                {
-                    x += directions[d][0];
-                    y += directions[d][1];
-
-                    if (x >= 0 && x < sizeX && y >= 0 && y < sizeY)
-                    {
-                        matrix[y][x] = count++;
-                        if((x+y)%2==0)Gizmos.color = Color.red;
-                        else Gizmos.color = Color.green;
-                        Gizmos.DrawCube(newStartPos + new Vector3(x * spacing, 0, y * spacing * 1.2f), new Vector3(1, 0.1f, 1.5f));
-                        //Instantiate(cardExamp, newStartPos + new Vector3(x * spacing, 0, y * spacing * 1.2f), cardExamp.transform.rotation);
-                        if (count > total) break;
-                    }
-                }
-                if (d % 2 == 1) steps++;
-            }
-        }
-
-    
-
         Gizmos.color = Color.yellow;
-        Gizmos.DrawCube(StartPos, new Vector3(1, .1f, 1.5f));
-        /*
-            Rect safeArea = Screen.safeArea;
-            Vector3 StartPos = new Vector3(safeArea.position.normalized.x, .1f, safeArea.position.normalized.y);
-
-            Gizmos.color = Color.blue;
-            for (int x = 0; x < 7; x++)
+        Gizmos.DrawCube(
+                            newStartPos + new Vector3(x * spacing, 0, y * spacing * verticalScale),
+                            new Vector3(1, 0.1f, 1.5f)
+                        );
+        int steps = 1;
+        while (count <= total)
+        {
+            for (int d = 0; d < 4; d++)
             {
-                for (int y = 0; y < 2; y++)
+                for (int s = 0; s < steps; s++)
                 {
+                    x += directions[d][0];
+                    y += directions[d][1];
 
 
-                    float spacing = 1.5f; // 1 (ширина) + 1 (зазор)
-                    Vector3 offsetup = new Vector3(x * spacing, 0, y * spacing*1.5f);
-                    Vector3 offsetdown = new Vector3(-x * spacing, 0, y * spacing * 1.5f);
 
-                    Gizmos.DrawCube(StartPos + offsetup, new Vector3(1, 0.1f, 1.5f));
+                    if (x >= 0 && x < sizeX && y >= 0 && y < sizeY)
+                    {
+                        count++;
 
-                    Gizmos.DrawCube(StartPos + offsetdown, new Vector3(1, 0.1f, 1.5f));
+                        Gizmos.DrawCube(
+                           newStartPos + new Vector3(x * spacing, 0, y * spacing * verticalScale),
+                           new Vector3(1, 0.1f, 1.5f)
+                       );
 
 
-                   // Gizmos.DrawCube(StartPos - offset, new Vector3(1, 0.1f, 1.5f));
+                        Gizmos.color = ((x + y) % 2 == 0) ? Color.red : Color.green;
 
+                        if (count > total) break;
+                    }
                 }
+                if (d % 2 == 1) steps++;
             }
-
-            for (int x = 0; x < 7; x++)
-            {
-                for (int y = 0; y < 3; y++)
-                {
-
-                    float spacing = 1.5f; // 1 (ширина) + 1 (зазор)
-                    Vector3 offsetup = new Vector3(-x * spacing, 0, -y * spacing * 1.5f);
-                    Vector3 offsetdown = new Vector3(x * spacing, 0, -y * spacing * 1.5f);
-
-                    Gizmos.DrawCube(StartPos + offsetup, new Vector3(1, 0.1f, 1.5f));
-
-                    Gizmos.DrawCube(StartPos + offsetdown, new Vector3(1, 0.1f, 1.5f));
+        }
 
 
-                    // Gizmos.DrawCube(StartPos - offset, new Vector3(1, 0.1f, 1.5f));
-
-                }
-            }
-
-
-            Gizmos.color = new Color(0.88f, 0f, 0.3f);
-            Gizmos.DrawCube(StartPos, new Vector3(1, .1f, 1.5f));*/
+        Gizmos.DrawCube(newStartPos, new Vector3(1, 0.1f, 1.5f));
     }
-    void Start()
+*/
+
+
+    void Awake()
     {
-        CardMatrix(MatrixSide.LeftDown);
+        safeArea = Screen.safeArea; 
+        //SpiralMatrixCards(5,4);
     }
 
-    
+
 }
