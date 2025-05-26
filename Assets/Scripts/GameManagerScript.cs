@@ -48,19 +48,25 @@ public class GameManagerScript : MonoBehaviour
             Vector3 cameraCenter =  MainCamera.GetComponent<Camera>().transform.position;
             Debug.Log(cameraCenter.x+"Camera x");
             Vector2 cameraSize = new Vector2 (cameraCenter.x, cameraCenter.z);
-            CreateCards(TableGrid.SpiralMatrixCards(6, 4), card.ShowMaterial());
+            
 
             //InitCards(cameraSize);
         }
 
     }
 
-    private void CreateCards(List<Vector3> vectorArray, List<Material> materials)
+    public void WholePoleInit()
     {
-        Debug.Log(vectorArray.Count+ "vector");
-        if (vectorArray.Count < 2) throw new ArgumentException("Cards count <2");
+        CreateCards(TableGrid.SpiralMatrixCards(4, 4), card.ShowMaterial());
 
-        for(int i = 0; i< vectorArray.Count/2-1; i++)
+    }
+
+    private void CreateCards(Vector3[] vectorArray, List<Material> materials)
+    {
+        Debug.Log(vectorArray.Length+ "vector");
+        if (vectorArray.Length < 2) throw new ArgumentException("Cards count <2");
+
+        for(int i = 0; i< vectorArray.Length/2; i++)
         {
             for (int j = 0; j < gameMode.gameMode.CardsToMatch; j++)
             {
@@ -68,7 +74,7 @@ public class GameManagerScript : MonoBehaviour
                 CardScript newCard = Instantiate(card, vectorArray[i* gameMode.gameMode.CardsToMatch+j], card.transform.rotation);
                 newCard.ChangeMaterial(i);
             }
-            //Thread.Sleep(2000);
+            Thread.Sleep(50);
 
         }
     }
@@ -155,5 +161,4 @@ public class GameManagerScript : MonoBehaviour
     }
 
 
-    delegate void Message();
 }

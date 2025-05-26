@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -11,11 +12,11 @@ public class TableGrid : MonoBehaviour
     private static Rect safeArea;
 
 
-    private static List<Vector3> vectorArray;
+    private static Vector3[] vectorArray;
 
-    public static List<Vector3> SpiralMatrixCards(int sizeX, int sizeY)
+    public static Vector3[] SpiralMatrixCards(int sizeX, int sizeY)
     {
-        vectorArray = new List<Vector3>();
+        vectorArray = new Vector3[sizeX * sizeY];
         //vectorArray = new Vector3[sizeX * sizeY];
         float spacing = 1.5f; 
         float verticalScale = 1.2f;
@@ -33,12 +34,19 @@ public class TableGrid : MonoBehaviour
         );
        
         int total = sizeX * sizeY;
+
+
         int count = 1;
 
         int x = sizeX / 2;
         int y = sizeY / 2;
+
+        
+
         if (sizeX % 2 == 0) x--;
         if (sizeY % 2 == 0) y--;
+        
+        vectorArray[y * sizeX + x] = newStartPos + new Vector3(x * spacing, 0, y * spacing * verticalScale);
 
         int[][] directions = new int[][]
         {
@@ -48,8 +56,7 @@ public class TableGrid : MonoBehaviour
      new int[]{0, -1}
         };
 
-        vectorArray.Add(newStartPos + new Vector3(x * spacing, 0, y * spacing * verticalScale));
-        count++;
+       count++;
         int steps = 1;
         while (count <= total)
         {
@@ -63,9 +70,8 @@ public class TableGrid : MonoBehaviour
                     if (x >= 0 && x < sizeX && y >= 0 && y < sizeY)
                     {
                         count++;
-                        vectorArray.Add(newStartPos + new Vector3(x * spacing, 0, y * spacing * verticalScale));
+                        vectorArray[y*sizeX+x]= newStartPos + new Vector3(x * spacing, 0, y * spacing * verticalScale);
 
-                        //Instantiate(cardExamp, newStartPos + new Vector3(x * spacing, 0, y * spacing * verticalScale), cardExamp.transform.rotation);
 
                         if (count > total) break;
                     }
@@ -73,9 +79,8 @@ public class TableGrid : MonoBehaviour
                 if (d % 2 == 1) steps++;
             }
         }
-        
 
-        //vectorArray[y * sizeX + x] = newStartPos + new Vector3(1 * spacing, 0, 1 * spacing * verticalScale);
+
         return vectorArray;
 
     }
