@@ -1,33 +1,28 @@
 using System;
 using UnityEngine;
 
-enum Modes
+public enum Modes
 {
-    Basic,
-    Mistake,
-    Infinite,
+    Basic = 0,
+    Mistake = 1,
+    Infinite = 2,
 }
 
 public class GameMode : MonoBehaviour
 {
+    private static int basicCardsCount = 12;
+    private static int basicCardsToMatchCount = 2;
 
-    private Modes mode = Modes.Basic;
-    public Basic gameMode;
-    private int basicCardsCount = 12;
-    private int basicCardsToMatchCount = 2;
-
-    public Basic GameModeSelector()
-    {
-        gameMode = mode switch
+    public static Basic GameModeSelector(int selectedMode)
+    
+        => selectedMode switch
         {
-            Modes.Infinite => new Infinite(basicCardsToMatchCount, basicCardsCount, true, -1),
-            Modes.Mistake => new Mistake(basicCardsToMatchCount, basicCardsCount, true, 10),
-            _ => new Basic(basicCardsToMatchCount, basicCardsCount, false, -1)
+            (int)Modes.Infinite => new Infinite(basicCardsToMatchCount, basicCardsCount, true, -1),
+            (int)Modes.Mistake => new Mistake(basicCardsToMatchCount, basicCardsCount, true, 3),
+            (int)Modes.Basic => new Basic(basicCardsToMatchCount, basicCardsCount, false, -1),
+            _ => throw new ArgumentOutOfRangeException(nameof(selectedMode))
         };
-        return gameMode;
-    }
-
-
+    
 }
 
 public class Basic

@@ -11,4 +11,6 @@ public class GameMenuScript:MonoBehaviour
     public void OptionsButton() => Debug.LogWarning("NotEnplemetedSectionOptions");
 
     public void BackToMenuButton() => Debug.LogWarning("NotEnplemetedSectionBackMenu");
+
+   
 }

@@ -14,7 +14,10 @@ public class GameManagerScript : MonoBehaviour
 
     [SerializeField] private GameObject startPosition;
 
-    public GameMode gameMode;
+    private Texture2D[] textures;
+
+    private bool isJokerHere;
+
 
     private Basic CurrentGameMode;
 
@@ -34,14 +37,15 @@ public class GameManagerScript : MonoBehaviour
         }
 
         Instance = this;    
-        DontDestroyOnLoad(gameObject);
+       // DontDestroyOnLoad(gameObject);
     }
 
      void Start()
     {
-        
-        gameMode = new();
-        CurrentGameMode = gameMode.GameModeSelector();
+
+        textures = SaveManager.Instance.saveMaterial;
+        isJokerHere = false;
+        CurrentGameMode = SaveManager.Instance.gameMode;
 
         if (MainCamera)
         {
@@ -49,30 +53,51 @@ public class GameManagerScript : MonoBehaviour
             Debug.Log(cameraCenter.x+"Camera x");
             Vector2 cameraSize = new Vector2 (cameraCenter.x, cameraCenter.z);
             
-
+            
             //InitCards(cameraSize);
         }
+        Debug.Log(CurrentGameMode.CardsInGame);
+        (int, int) sides = MatrixSidesAnalizer(CurrentGameMode.CardsInGame);
+     
+        CreateCards(TableGrid.SpiralMatrixCards(sides.Item1, sides.Item2));
 
+    }
+
+    private (int,int) MatrixSidesAnalizer(int square)
+    {
+        ( int x,int y) tuple = (0,0);
+        if (square % 2 != 0)
+        {
+            isJokerHere = true;
+            square -= 1;
+        }
+        for(int i = 4; i > 0; i--)
+        {
+            if (square % i == 0) { tuple.y = i; tuple.x = square / i; break; }
+        }
+        return tuple;   
     }
 
     public void WholePoleInit()
     {
-        CreateCards(TableGrid.SpiralMatrixCards(4, 4), card.ShowMaterial());
+        CreateCards(TableGrid.SpiralMatrixCards(4, 4));
 
     }
 
-    private void CreateCards(Vector3[] vectorArray, List<Material> materials)
+    private void CreateCards(Vector3[] vectorArray)
     {
         Debug.Log(vectorArray.Length+ "vector");
         if (vectorArray.Length < 2) throw new ArgumentException("Cards count <2");
 
         for(int i = 0; i< vectorArray.Length/2; i++)
         {
-            for (int j = 0; j < gameMode.gameMode.CardsToMatch; j++)
+            int newId = (i + textures.Length) % textures.Length;
+            for (int j = 0; j < CurrentGameMode.CardsToMatch; j++)
             {
-                Debug.Log(i);
-                CardScript newCard = Instantiate(card, vectorArray[i* gameMode.gameMode.CardsToMatch+j], card.transform.rotation);
-                newCard.ChangeMaterial(i);
+                Debug.Log(newId);
+                CardScript newCard = Instantiate(card, vectorArray[i* CurrentGameMode.CardsToMatch+j], card.transform.rotation);
+                
+                newCard.ChangeMaterial( newId,textures[newId]);
             }
             Thread.Sleep(50);
 
@@ -86,22 +111,23 @@ public class GameManagerScript : MonoBehaviour
 
         currentCardId.Add(cardId);
         cardId.GetComponent<BoxCollider>().enabled = false;
-        if (currentCardId.Count == gameMode.gameMode.CardsToMatch) {
+        if (currentCardId.Count == CurrentGameMode.CardsToMatch) {
             if (currentCardId.All(x => x.ShowStats().ShowId() == cardId.ShowStats().ShowId()))
             {
                 Debug.Log("Same Cards!"); 
-                gameMode.gameMode.CardsInGame-= gameMode.gameMode.CardsToMatch;
+                CurrentGameMode.CardsInGame-= CurrentGameMode.CardsToMatch;
                
                 StartCoroutine(EnableCards());
 
             }
-            else { Debug.Log("Didnt Match!"); gameMode.gameMode.mistakes--; }
+            else { Debug.Log("Didnt Match!"); CurrentGameMode.mistakes--; }
+            foreach (var card in currentCardId) { card.ShowStats().ShowId(); }
 
             StartCoroutine(ResetCards());
                        
             
         }
-        return gameMode.gameMode.IsContinueValid();
+        return CurrentGameMode.IsContinueValid();
         
     }
 
@@ -124,7 +150,7 @@ public class GameManagerScript : MonoBehaviour
     }
 
    
-    private void InitCards(Vector2 cameraCenter)
+    /*private void InitCards(Vector2 cameraCenter)
     {
         Vector3 gameBoardVec = Vector3.one;
         if (GameBoard)
@@ -159,6 +185,6 @@ public class GameManagerScript : MonoBehaviour
         }
 
     }
+*/
 
-
-}
+}//Cards in game
