@@ -7,15 +7,16 @@ public class SelectionMenuScript : MonoBehaviour
     [SerializeField]private Slider slider;
 
     [SerializeField] private MaterialScript materialSelection;
+    [SerializeField] private SelectionMenuCard card;
 
-
-    public void SelectedStyle(string imageSource)
+    private void Start()
     {
-        
-        materialSelection.InintFirstCard(imageSource);
-       
+        Instantiate(card,Vector3.zero, card.transform.rotation);
     }
 
+
+    public void SelectedStyle(string imageSource)=>materialSelection.InintFirstCard(imageSource);
+        
     public void CardsCountSlider()
     {
         Debug.Log(slider.value);

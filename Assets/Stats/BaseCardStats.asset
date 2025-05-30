@@ -14,3 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _id: 4
   _name: Card
+  _material: {fileID: 2100000, guid: 37e9bee7ea355094ea490dcce88ade79, type: 2}

@@ -112,6 +112,8 @@ public class GameManagerScript : MonoBehaviour
         currentCardId.Add(cardId);
         cardId.GetComponent<BoxCollider>().enabled = false;
         if (currentCardId.Count == CurrentGameMode.CardsToMatch) {
+            
+
             if (currentCardId.All(x => x.ShowStats().ShowId() == cardId.ShowStats().ShowId()))
             {
                 Debug.Log("Same Cards!"); 
@@ -122,7 +124,6 @@ public class GameManagerScript : MonoBehaviour
             }
             else { Debug.Log("Didnt Match!"); CurrentGameMode.mistakes--; }
             foreach (var card in currentCardId) { card.ShowStats().ShowId(); }
-
             StartCoroutine(ResetCards());
                        
             
@@ -133,17 +134,25 @@ public class GameManagerScript : MonoBehaviour
 
     private IEnumerator ResetCards()
     {
-        yield return new WaitForSeconds(1f);
-        foreach (CardScript card in currentCardId) { card.GetComponent<BoxCollider>().enabled = true; }
+        yield return new WaitForSeconds(0.3f);
+        foreach (CardScript card in currentCardId) { 
+
+            card.GetComponent<BoxCollider>().enabled = true;
+            card.StartRotation(0f);
+        }
         currentCardId.Clear();
 
     }
 
     private IEnumerator EnableCards()
     {
-        yield return new WaitForSeconds(1f);
-        foreach (CardScript card in currentCardId) { Destroy(card); }
-        
+        yield return new WaitForSeconds(0.3f);
+        foreach (CardScript card in currentCardId) {
+            card.StartRotation(0f);
+
+            //Destroy(card);
+        }
+
         Debug.Log("Cards Destroyed");
         currentCardId.Clear();
 

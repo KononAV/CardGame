@@ -5,16 +5,23 @@ using Unity.VisualScripting;
 using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using UnityEngine;
 
-public class CardScript : MonoBehaviour
+public class CardScript : MonoBehaviour, ICard
 {
     [SerializeField] private CardStats _stats;
-    [SerializeField] private Material _material;
+    private Material _material;
+    public Material Material
+    {
+        get { return _material; }
+        set { _material = value; }
+    }
+    public float duration = 0.2f;
 
     private CardStats stats;
 
     private void Awake()
     {
-        stats = ScriptableObject.CreateInstance<CardStats>();  
+        stats = Instantiate(_stats);
+        _material = stats.GetMaterial();
 
     }
 
@@ -42,10 +49,14 @@ public class CardScript : MonoBehaviour
         
     }
 
-        
+
+
+    /// <summary>
+    /// for mouse only/ correct after all
+    /// </summary>
     private void OnMouseDown()
     {
-
+        StartRotation(-180);
         Debug.Log(stats.ShowId());
         if (!GameManagerScript.Instance.IsMatch(this))
         {
@@ -53,5 +64,34 @@ public class CardScript : MonoBehaviour
         }
         ;
     }
+    /// <summary>
+    /// for mouse only/ correct after all
+    /// </summary>
 
+    private IEnumerator RotateRight(float targetZAngle)
+    {
+        Quaternion startRotation = transform.rotation;
+        Quaternion endRotation = Quaternion.Euler(0f, 0f, targetZAngle);
+
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            float t = elapsed / duration;
+            transform.rotation = Quaternion.Lerp(startRotation, endRotation, t);
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        transform.rotation = endRotation;
+    }
+    
+
+    public void StartRotation(float targetZAngle)
+    {
+        StopAllCoroutines();
+        StartCoroutine(RotateRight(targetZAngle));
+    }
+
+   
 }

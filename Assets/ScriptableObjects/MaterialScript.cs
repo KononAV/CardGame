@@ -10,17 +10,20 @@ public class MaterialScript : ScriptableObject
     public Texture2D[] images { get;private set; }
 
     public Texture2D firstImage { get; private set; }
-
     private string path;
 
     public Texture2D[] InitFolder()
     {
-        images = Resources.LoadAll<Texture2D>(SplitSource(path));
-        foreach (var image in images)
-        {
+        if (path == "") path = "png/BaseCards/blue";
 
-            Debug.Log(image.name);
-        }
+        Debug.Log(path + "patj");
+        images = Resources.LoadAll<Texture2D>(SplitSource(path));
+            foreach (var image in images)
+            {
+
+                Debug.Log(image.name);
+            }
+        
         return images;
     }
 
