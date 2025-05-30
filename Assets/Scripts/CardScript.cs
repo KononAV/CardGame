@@ -56,6 +56,7 @@ public class CardScript : MonoBehaviour, ICard
     /// </summary>
     private void OnMouseDown()
     {
+        if (GameManagerScript.Instance.isFool) return;
         StartRotation(-180);
         Debug.Log(stats.ShowId());
         if (!GameManagerScript.Instance.IsMatch(this))
@@ -71,7 +72,7 @@ public class CardScript : MonoBehaviour, ICard
     private IEnumerator RotateRight(float targetZAngle)
     {
         Quaternion startRotation = transform.rotation;
-        Quaternion endRotation = Quaternion.Euler(0f, 0f, targetZAngle);
+        Quaternion endRotation = Quaternion.Euler(0f, 180f, targetZAngle);
 
         float elapsed = 0f;
 

@@ -17,6 +17,7 @@ public class GameManagerScript : MonoBehaviour
     private Texture2D[] textures;
 
     private bool isJokerHere;
+    public bool isFool { get; private set; }
 
 
     private Basic CurrentGameMode;
@@ -42,7 +43,7 @@ public class GameManagerScript : MonoBehaviour
 
      void Start()
     {
-
+        isFool = false;
         textures = SaveManager.Instance.saveMaterial;
         isJokerHere = false;
         CurrentGameMode = SaveManager.Instance.gameMode;
@@ -112,19 +113,20 @@ public class GameManagerScript : MonoBehaviour
         currentCardId.Add(cardId);
         cardId.GetComponent<BoxCollider>().enabled = false;
         if (currentCardId.Count == CurrentGameMode.CardsToMatch) {
-            
+            isFool = true;
 
             if (currentCardId.All(x => x.ShowStats().ShowId() == cardId.ShowStats().ShowId()))
             {
                 Debug.Log("Same Cards!"); 
                 CurrentGameMode.CardsInGame-= CurrentGameMode.CardsToMatch;
-               
                 StartCoroutine(EnableCards());
+              
 
             }
             else { Debug.Log("Didnt Match!"); CurrentGameMode.mistakes--; }
             foreach (var card in currentCardId) { card.ShowStats().ShowId(); }
             StartCoroutine(ResetCards());
+            
                        
             
         }
@@ -141,6 +143,8 @@ public class GameManagerScript : MonoBehaviour
             card.StartRotation(0f);
         }
         currentCardId.Clear();
+        isFool = false;
+
 
     }
 
@@ -155,10 +159,12 @@ public class GameManagerScript : MonoBehaviour
 
         Debug.Log("Cards Destroyed");
         currentCardId.Clear();
+        isFool = false;
+
 
     }
 
-   
+
     /*private void InitCards(Vector2 cameraCenter)
     {
         Vector3 gameBoardVec = Vector3.one;

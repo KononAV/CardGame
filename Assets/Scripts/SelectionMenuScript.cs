@@ -8,14 +8,15 @@ public class SelectionMenuScript : MonoBehaviour
 
     [SerializeField] private MaterialScript materialSelection;
     [SerializeField] private SelectionMenuCard card;
+    private SelectionMenuCard _card;
 
     private void Start()
     {
-        Instantiate(card,Vector3.zero, card.transform.rotation);
+        _card = Instantiate(card,new Vector3(4,4.4f,-5.5f), card.transform.rotation);
     }
 
 
-    public void SelectedStyle(string imageSource)=>materialSelection.InintFirstCard(imageSource);
+    public void SelectedStyle(string imageSource)=>_card.GetComponent<Renderer>().material.SetTexture("_BaseMap", materialSelection.InintFirstCard(imageSource));
         
     public void CardsCountSlider()
     {

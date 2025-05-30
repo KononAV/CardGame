@@ -27,11 +27,11 @@ public class MaterialScript : ScriptableObject
         return images;
     }
 
-    public void InintFirstCard(string imageSourse)
+    public Texture2D InintFirstCard(string imageSourse)
     {
         path = imageSourse;
         firstImage = Resources.Load<Texture2D>(path);
-        
+        return Resources.Load<Texture2D>(path);
     }
 
     private string SplitSource(string image) => Path.GetDirectoryName(image);
