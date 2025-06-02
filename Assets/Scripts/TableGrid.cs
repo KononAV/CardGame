@@ -16,7 +16,7 @@ public class TableGrid : MonoBehaviour
 
     public static Vector3[] SpiralMatrixCards(int sizeX, int sizeY)
     {
-        vectorArray = new Vector3[sizeX * sizeY];
+        vectorArray = new Vector3[SaveManager.Instance.gameMode.SelectedCards];
         //vectorArray = new Vector3[sizeX * sizeY];
         float spacing = 1.5f; 
         float verticalScale = 1.2f;
@@ -70,6 +70,7 @@ public class TableGrid : MonoBehaviour
                     if (x >= 0 && x < sizeX && y >= 0 && y < sizeY)
                     {
                         count++;
+                        if (y * sizeX + x >= vectorArray.Length) continue;
                         vectorArray[y*sizeX+x]= newStartPos + new Vector3(x * spacing, 0, y * spacing * verticalScale);
 
 
@@ -169,7 +170,7 @@ public class TableGrid : MonoBehaviour
 
     void Awake()
     {
-        safeArea = Screen.safeArea; 
+        safeArea = SaveManager.Instance.safeArea;
         //SpiralMatrixCards(5,4);
     }
 

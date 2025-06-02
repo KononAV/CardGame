@@ -4,6 +4,8 @@ public class SaveManager : MonoBehaviour
 {
     public Basic gameMode;
     public Texture2D[] saveMaterial;
+    public Rect safeArea;
+
 
     public static SaveManager Instance { get; set; }
 
@@ -22,7 +24,7 @@ public class SaveManager : MonoBehaviour
     void Start()
     {
         gameMode = GameMode.GameModeSelector(0);
-
+        safeArea = Screen.safeArea;
 
     }
 }

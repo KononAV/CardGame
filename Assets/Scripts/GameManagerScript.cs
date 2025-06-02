@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+
 using System.Linq;
 using System.Threading;
 using Unity.VisualScripting;
@@ -13,6 +14,8 @@ public class GameManagerScript : MonoBehaviour
     [SerializeField] private CardScript card;
 
     [SerializeField] private GameObject startPosition;
+
+    [SerializeField] private GameObject finalPoint;
 
     private Texture2D[] textures;
 
@@ -38,11 +41,34 @@ public class GameManagerScript : MonoBehaviour
         }
 
         Instance = this;    
-       // DontDestroyOnLoad(gameObject);
+        //DontDestroyOnLoad(gameObject);
     }
 
-     void Start()
+
+    private Vector3 TrashPlaceInit()
     {
+        Rect safeArea =  SaveManager.Instance.safeArea;
+        Vector3 viewportPos = MainCamera.ScreenToViewportPoint(safeArea.position);
+
+        Vector3 worldPos = MainCamera.ViewportToWorldPoint(new Vector3(viewportPos.x,0 ,viewportPos.y ));
+
+        Vector3 maxPos = MainCamera.ViewportToWorldPoint(
+            MainCamera.ScreenToViewportPoint(
+                new Vector3(
+                    safeArea.xMax,
+                    0,
+                    safeArea.yMax)));
+
+        float width = maxPos.x - worldPos.x;
+        return new Vector3(worldPos.x+width/15f, 0, worldPos.z);
+    }
+     void Start()
+     {
+       
+
+        finalPoint.transform.position = TrashPlaceInit();
+
+        
         isFool = false;
         textures = SaveManager.Instance.saveMaterial;
         isJokerHere = false;
@@ -55,27 +81,34 @@ public class GameManagerScript : MonoBehaviour
             Vector2 cameraSize = new Vector2 (cameraCenter.x, cameraCenter.z);
             
             
-            //InitCards(cameraSize);
         }
         Debug.Log(CurrentGameMode.CardsInGame);
+        CurrentGameMode.CardsInGame = CurrentGameMode.SelectedCards;
         (int, int) sides = MatrixSidesAnalizer(CurrentGameMode.CardsInGame);
      
         CreateCards(TableGrid.SpiralMatrixCards(sides.Item1, sides.Item2));
 
-    }
+     }
 
     private (int,int) MatrixSidesAnalizer(int square)
     {
-        ( int x,int y) tuple = (0,0);
+        Debug.Log(square+"sqare");
         if (square % 2 != 0)
         {
             isJokerHere = true;
             square -= 1;
         }
-        for(int i = 4; i > 0; i--)
+        ( int x,int y) tuple = (0,0);
+        if (square <= 10)
         {
-            if (square % i == 0) { tuple.y = i; tuple.x = square / i; break; }
+            tuple.y = 2;
         }
+        else if (square <= 20) { tuple.y = 3; }
+        else tuple.y = 4;
+
+        tuple.x = (int)Math.Floor((decimal)square / tuple.y)+square%tuple.y; 
+        
+       
         return tuple;   
     }
 
@@ -85,7 +118,7 @@ public class GameManagerScript : MonoBehaviour
 
     }
 
-    private void CreateCards(Vector3[] vectorArray)
+    private void CreateCards(in Vector3[] vectorArray)
     {
         Debug.Log(vectorArray.Length+ "vector");
         if (vectorArray.Length < 2) throw new ArgumentException("Cards count <2");
@@ -120,6 +153,7 @@ public class GameManagerScript : MonoBehaviour
                 Debug.Log("Same Cards!"); 
                 CurrentGameMode.CardsInGame-= CurrentGameMode.CardsToMatch;
                 StartCoroutine(EnableCards());
+                
               
 
             }
@@ -152,7 +186,8 @@ public class GameManagerScript : MonoBehaviour
     {
         yield return new WaitForSeconds(0.3f);
         foreach (CardScript card in currentCardId) {
-            card.StartRotation(0f);
+            //card.StartRotation(0f);
+            StartCoroutine(card.MoveToFinalPos(finalPoint.transform.position.x));
 
             //Destroy(card);
         }
@@ -202,4 +237,4 @@ public class GameManagerScript : MonoBehaviour
     }
 */
 
-}//Cards in game
+}//Cards in vector

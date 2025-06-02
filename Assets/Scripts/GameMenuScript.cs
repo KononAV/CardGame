@@ -1,4 +1,6 @@
+using UnityEditor.SearchService;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameMenuScript:MonoBehaviour
 {
@@ -12,5 +14,5 @@ public class GameMenuScript:MonoBehaviour
 
     public void BackToMenuButton() => Debug.LogWarning("NotEnplemetedSectionBackMenu");
 
-   
+    public void Restart() => SceneManager.LoadScene("SampleScene");
 }

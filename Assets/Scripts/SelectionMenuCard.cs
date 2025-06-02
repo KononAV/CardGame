@@ -59,7 +59,7 @@ public class SelectionMenuCard : MonoBehaviour, ICard
 #endif
     }
 
-    private void TryStartDrag(Vector2 screenPos)
+    private void TryStartDrag(in Vector2 screenPos)
     {
         //StopAllCoroutines();
         Ray ray = mainCam.ScreenPointToRay(screenPos);
@@ -73,7 +73,7 @@ public class SelectionMenuCard : MonoBehaviour, ICard
         }
     }
 
-    private void Drag(Vector2 currentPos)
+    private void Drag(in Vector2 currentPos)
     {
         float deltaX = currentPos.x - lastPos.x;
         transform.Rotate(Vector3.up, -deltaX * rotationSpeed, Space.World);
@@ -82,6 +82,6 @@ public class SelectionMenuCard : MonoBehaviour, ICard
     }
 
 
-public void ChangeMaterial(int id, Texture2D texture) =>
+public void ChangeMaterial(int id, in Texture2D texture) =>
         GetComponent<Renderer>().material.SetTexture("_BaseMap", texture);
 }

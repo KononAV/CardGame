@@ -11,10 +11,13 @@ public class CardScript : MonoBehaviour, ICard
     private Material _material;
     public Material Material
     {
-        get { return _material; }
-        set { _material = value; }
+        get => _material; 
+        set =>_material = value; 
     }
-    public float duration = 0.2f;
+    private float duration = 0.2f;
+    private float followSpeed = 2f;  
+    private float followDelay = 0.02f;
+
 
     private CardStats stats;
 
@@ -29,6 +32,7 @@ public class CardScript : MonoBehaviour, ICard
     {
         gameObject.GetComponent<Renderer>().material = _material;
 
+        
 
     }
 
@@ -37,7 +41,7 @@ public class CardScript : MonoBehaviour, ICard
 
 
 
-    public void ChangeMaterial(int id,Texture2D texture)
+    public void ChangeMaterial(int id,in Texture2D texture)
     {
         ShowStats().NewId(id);
         var renderer = GetComponent<Renderer>();
@@ -68,6 +72,20 @@ public class CardScript : MonoBehaviour, ICard
     /// <summary>
     /// for mouse only/ correct after all
     /// </summary>
+
+     
+
+    public IEnumerator MoveToFinalPos(float x)
+    {
+        while (true) 
+        {
+            if (x < transform.position.x)
+            {
+                transform.position = Vector3.Lerp(transform.position,new Vector3(x, transform.position.y, transform.position.z), followDelay*followSpeed);
+            }
+            yield return new WaitForSeconds(followDelay);
+        }
+    }
 
     private IEnumerator RotateRight(float targetZAngle)
     {
