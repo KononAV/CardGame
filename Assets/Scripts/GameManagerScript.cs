@@ -40,8 +40,12 @@ public class GameManagerScript : MonoBehaviour
             return;
         }
 
-        Instance = this;    
+        Instance = this;
+
         //DontDestroyOnLoad(gameObject);
+
+
+
     }
 
 
@@ -65,7 +69,7 @@ public class GameManagerScript : MonoBehaviour
      void Start()
      {
        
-
+        
         finalPoint.transform.position = TrashPlaceInit();
 
         
@@ -73,7 +77,7 @@ public class GameManagerScript : MonoBehaviour
         textures = SaveManager.Instance.saveMaterial;
         isJokerHere = false;
         CurrentGameMode = SaveManager.Instance.gameMode;
-
+        CurrentGameMode.InitModeFitures();  
         if (MainCamera)
         {
             Vector3 cameraCenter =  MainCamera.GetComponent<Camera>().transform.position;
@@ -123,18 +127,26 @@ public class GameManagerScript : MonoBehaviour
         Debug.Log(vectorArray.Length+ "vector");
         if (vectorArray.Length < 2) throw new ArgumentException("Cards count <2");
 
+        
+
         for(int i = 0; i< vectorArray.Length/2; i++)
         {
             int newId = (i + textures.Length) % textures.Length;
             for (int j = 0; j < CurrentGameMode.CardsToMatch; j++)
             {
                 Debug.Log(newId);
-                CardScript newCard = Instantiate(card, vectorArray[i* CurrentGameMode.CardsToMatch+j], card.transform.rotation);
-                
+                CardScript newCard =PoolManager.Instance.GetCard();
+                newCard.transform.position = vectorArray[i * CurrentGameMode.CardsToMatch + j];
+                newCard.transform.rotation = card.transform.rotation;
                 newCard.ChangeMaterial( newId,textures[newId]);
             }
-            Thread.Sleep(50);
 
+        }
+        Debug.Log(CurrentGameMode.isSwipe + " delegates count");
+        if (CurrentGameMode.eventDelgates.Count != 0)
+        {
+            CurrentGameMode.eventDelgates[0]();
+            CurrentGameMode.eventDelgates.RemoveAt(0);
         }
     }
 
@@ -159,6 +171,12 @@ public class GameManagerScript : MonoBehaviour
             }
             else { Debug.Log("Didnt Match!"); CurrentGameMode.mistakes--; }
             foreach (var card in currentCardId) { card.ShowStats().ShowId(); }
+            foreach (var del in CurrentGameMode.eventDelgates) 
+            {
+                Debug.Log("Start Swipe");
+                del();
+            }
+            Debug.Log("End Swipe");
             StartCoroutine(ResetCards());
             
                        
@@ -177,6 +195,7 @@ public class GameManagerScript : MonoBehaviour
             card.StartRotation(0f);
         }
         currentCardId.Clear();
+        
         isFool = false;
 
 
@@ -188,7 +207,8 @@ public class GameManagerScript : MonoBehaviour
         foreach (CardScript card in currentCardId) {
             //card.StartRotation(0f);
             StartCoroutine(card.MoveToFinalPos(finalPoint.transform.position.x));
-
+            if (CurrentGameMode.localCards!=null) { CurrentGameMode.localCards.Remove(card); }
+            //CurrentGameMode.localCards.Remove(card);
             //Destroy(card);
         }
 
@@ -196,9 +216,9 @@ public class GameManagerScript : MonoBehaviour
         currentCardId.Clear();
         isFool = false;
 
-
+        //StopAllCoroutines();
     }
-
+    
 
     /*private void InitCards(Vector2 cameraCenter)
     {

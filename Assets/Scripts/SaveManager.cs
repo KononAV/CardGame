@@ -23,7 +23,7 @@ public class SaveManager : MonoBehaviour
 
     void Start()
     {
-        gameMode = GameMode.GameModeSelector(0);
+        //gameMode = GameMode.GameModeSelector(0);
         safeArea = Screen.safeArea;
 
     }

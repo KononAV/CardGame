@@ -9,6 +9,9 @@ public class SelectionMenuScript : MonoBehaviour
     [SerializeField] private MaterialScript materialSelection;
     [SerializeField] private SelectionMenuCard card;
     private SelectionMenuCard _card;
+    private int mode;
+
+    private bool isSwipe;
 
     private void Awake()
     {
@@ -26,13 +29,22 @@ public class SelectionMenuScript : MonoBehaviour
 
     public void ModeSelect(string mode)
     {
-        SaveManager.Instance.gameMode = GameMode.GameModeSelector(int.Parse(mode));
-        Debug.Log(SaveManager.Instance.gameMode.ToString());
+        this.mode = int.Parse(mode); 
+        Debug.Log((Modes)this.mode);
     }
+
+    public void OnIsSwipe()
+    {
+        isSwipe = !isSwipe;
+        Debug.Log(isSwipe);
+    }
+
 
 
     public void StartButton()
     {
+        SaveManager.Instance.gameMode = GameMode.GameModeSelector(mode);
+        SaveManager.Instance.gameMode.isSwipe = isSwipe;
         SaveManager.Instance.saveMaterial = materialSelection.InitFolder();
 
         SaveManager.Instance.gameMode.SelectedCards = (int)slider.value;

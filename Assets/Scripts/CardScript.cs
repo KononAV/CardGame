@@ -63,9 +63,15 @@ public class CardScript : MonoBehaviour, ICard
         if (GameManagerScript.Instance.isFool) return;
         StartRotation(-180);
         Debug.Log(stats.ShowId());
+
+        
         if (!GameManagerScript.Instance.IsMatch(this))
         {
             Debug.Log("Game Over");
+          foreach(var card in PoolManager.Instance.cardsList)
+            {
+                PoolManager.Instance.ReleaseCard(card);
+            }
         }
         ;
     }
@@ -74,6 +80,28 @@ public class CardScript : MonoBehaviour, ICard
     /// </summary>
 
      
+    public void StartChange(in Vector3 vector)
+    {
+        //StopAllCoroutines();
+
+        StartCoroutine(OnPositionChange(vector));
+    }
+
+    private IEnumerator OnPositionChange(Vector3 targetPosition)
+    {
+        float duration = 1.0f; 
+        float elapsedTime = 0f;
+        Vector3 startingPosition = transform.position;
+
+        while (elapsedTime < duration)
+        {
+            transform.position = Vector3.Lerp(startingPosition, targetPosition, elapsedTime / duration);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        transform.position = targetPosition; 
+    }
 
     public IEnumerator MoveToFinalPos(float x)
     {
@@ -83,8 +111,11 @@ public class CardScript : MonoBehaviour, ICard
             {
                 transform.position = Vector3.Lerp(transform.position,new Vector3(x, transform.position.y, transform.position.z), followDelay*followSpeed);
             }
+            //PoolManager.Instance.ReleaseCard(this);
             yield return new WaitForSeconds(followDelay);
         }
+
+        
     }
 
     private IEnumerator RotateRight(float targetZAngle)
@@ -108,7 +139,7 @@ public class CardScript : MonoBehaviour, ICard
 
     public void StartRotation(float targetZAngle)
     {
-        StopAllCoroutines();
+        //StopAllCoroutines();
         StartCoroutine(RotateRight(targetZAngle));
     }
 
