@@ -53,5 +53,14 @@ public class PoolManager : MonoBehaviour
     public CardScript GetCard() {
         return cardsPool.Get(); }
 
-    public void ReleaseCard(CardScript card)=>cardsPool.Release(card);  
+    public void ReleaseCard(CardScript card) {cardsPool.Release(card); }
+
+    public void ReleaseAllCards()
+    {
+        foreach (var card in cardsList)
+        {
+            card.GetComponent<BoxCollider>().enabled = true;
+            ReleaseCard(card);
+        }
+    }
 }

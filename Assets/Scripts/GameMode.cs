@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.Threading.Tasks;
 
 
 public enum Modes
@@ -43,6 +44,8 @@ public class Basic
     private bool isJoker;
     public bool isSwipe;
 
+    System.Random rng;
+
     public List<CardScript> localCards;
 
     public List<EventDelegate> eventDelgates;
@@ -55,16 +58,19 @@ public class Basic
         this.mistakes = mistakes;
 
         eventDelgates = new List<EventDelegate>();
+        localCards = new List<CardScript>();
         Debug.Log(isSwipe + "swipe");
-       
+
 
     }
 
     public virtual void InitModeFitures()
-    { 
-        if (isSwipe) {
+    {
+        if (isSwipe)
+        {
             eventDelgates.Add(AfterCardsInit);
-            eventDelgates.Add(Swipe); 
+            eventDelgates.Add(Swipe);
+            rng = new System.Random();
         }
 
     }
@@ -75,30 +81,37 @@ public class Basic
         return CardsInGame >= CardsToMatch;
     }
 
-   
-    public virtual void Swipe() {
 
+    public virtual void Swipe()
+    {
         List<CardScript> shuffledCards = new List<CardScript>(localCards);
-        Shuffle(shuffledCards);
+        Shuffle(ref shuffledCards);
 
-        List<CardScript> selectedCards = shuffledCards.Take(CardsToMatch).ToList();
+        shuffledCards = shuffledCards.Take(CardsToMatch).ToList();
 
-        List<Vector3> targetPositions = selectedCards.Select(card => card.transform.position).ToList();
+        List<Vector3> targetPositions = shuffledCards.Select(card => card.transform.position).ToList();
 
-        Shuffle(targetPositions);
-        for (int i = 0; i < targetPositions.Count; i++) { selectedCards[i].StartChange(targetPositions[i]); }
+        Shuffle(ref targetPositions);
+        for (int i = 0; i < targetPositions.Count; i++)
+        {
+
+            localCards.Remove(shuffledCards[i]);
+            shuffledCards[i].GetComponent<BoxCollider>().enabled = false;
+            shuffledCards[i].StartChange(targetPositions[i]);
+
+        }
 
 
     }
 
-    private void Shuffle<T>(List<T> list)
+    private void Shuffle<T>(ref List<T> list)
     {
-        System.Random rng = new System.Random();
+        
         int n = list.Count;
         while (n > 1)
         {
             n--;
-            int k = rng.Next(n + 1);
+            int k = rng.Next(0, n - 1);
             T value = list[k];
             list[k] = list[n];
             list[n] = value;
@@ -109,48 +122,58 @@ public class Basic
     {
         localCards = new List<CardScript>();
 
-        Debug.Log("cards in game:" + CardsInGame + " cards in pool:" + PoolManager.Instance.cardsList.Count);
         foreach (var card in PoolManager.Instance.cardsList)
         {
             localCards.Add(card);
         }
 
-        foreach(var card in localCards)
-        {
-            Debug.Log(card+" local card");
-        }
     }
 
- 
+
 
     public delegate void EventDelegate();
 }
 
 public class Mistake : Basic
 {
-    public Mistake(int cardsToMatch, bool isInfinite, int mistakes) : base(cardsToMatch, isInfinite, mistakes) {  }
+    public Mistake(int cardsToMatch, bool isInfinite, int mistakes) : base(cardsToMatch, isInfinite, mistakes) { }
 
     public override bool IsContinueValid()
     {
-        Debug.Log("Infinit");
+        Debug.Log("Mistake");
 
         return mistakes > 0;
     }
 
-    
+
 }
 public class Infinite : Basic
 {
     public Infinite(int cardsToMatch, bool isInfinite, int mistakes) : base(cardsToMatch, isInfinite, mistakes) { }
     public override bool IsContinueValid()
     {
-        Debug.Log("Cards in game:" + CardsInGame + " Cards to mathc:" + CardsToMatch);
-        if (CardsInGame < CardsToMatch) { SceneManager.LoadScene("SampleScene");  }
 
-        
+
+
+        Debug.Log("Cards in game:" + CardsInGame + " Cards to mathc:" + CardsToMatch);
+        if (CardsInGame < CardsToMatch)
+        {
+
+            if (GameManagerScript.Instance.isFool) return false;
+
+            PoolManager.Instance.ReleaseAllCards();
+            Debug.Log("Selected cards" + SelectedCards);
+            CardsInGame = SelectedCards;
+
+
+            (int, int) sides = GameManagerScript.Instance.MatrixSidesAnalizer(SelectedCards);
+            GameManagerScript.Instance.CreateCards(TableGrid.SpiralMatrixCards(sides.Item1, sides.Item2));
+            AfterCardsInit();
+            return false;
+        }
+
+
         return true;
     }
 
 }
-
-

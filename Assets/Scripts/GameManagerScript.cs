@@ -6,6 +6,7 @@ using System.Diagnostics.CodeAnalysis;
 
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -89,12 +90,17 @@ public class GameManagerScript : MonoBehaviour
         Debug.Log(CurrentGameMode.CardsInGame);
         CurrentGameMode.CardsInGame = CurrentGameMode.SelectedCards;
         (int, int) sides = MatrixSidesAnalizer(CurrentGameMode.CardsInGame);
-     
         CreateCards(TableGrid.SpiralMatrixCards(sides.Item1, sides.Item2));
+        
+        if (CurrentGameMode.eventDelgates.Count != 0)
+        {
+            CurrentGameMode.eventDelgates[0]();
+            CurrentGameMode.eventDelgates.RemoveAt(0);
+        }
 
      }
 
-    private (int,int) MatrixSidesAnalizer(int square)
+    public (int,int) MatrixSidesAnalizer(int square)
     {
         Debug.Log(square+"sqare");
         if (square % 2 != 0)
@@ -122,12 +128,10 @@ public class GameManagerScript : MonoBehaviour
 
     }
 
-    private void CreateCards(in Vector3[] vectorArray)
-    {
-        Debug.Log(vectorArray.Length+ "vector");
-        if (vectorArray.Length < 2) throw new ArgumentException("Cards count <2");
 
-        
+ 
+    public void CreateCards(in Vector3[] vectorArray)
+    {
 
         for(int i = 0; i< vectorArray.Length/2; i++)
         {
@@ -135,66 +139,83 @@ public class GameManagerScript : MonoBehaviour
             for (int j = 0; j < CurrentGameMode.CardsToMatch; j++)
             {
                 Debug.Log(newId);
-                CardScript newCard =PoolManager.Instance.GetCard();
+                CardScript newCard = PoolManager.Instance.GetCard();
                 newCard.transform.position = vectorArray[i * CurrentGameMode.CardsToMatch + j];
                 newCard.transform.rotation = card.transform.rotation;
                 newCard.ChangeMaterial( newId,textures[newId]);
             }
 
         }
-        Debug.Log(CurrentGameMode.isSwipe + " delegates count");
-        if (CurrentGameMode.eventDelgates.Count != 0)
-        {
-            CurrentGameMode.eventDelgates[0]();
-            CurrentGameMode.eventDelgates.RemoveAt(0);
-        }
+        
     }
 
 
     public bool IsMatch(CardScript cardId)
     {
-        //Debug.Log(cardId.ShowStats().ShowId());
 
         currentCardId.Add(cardId);
+        CurrentGameMode.localCards.Remove(cardId);
         cardId.GetComponent<BoxCollider>().enabled = false;
-        if (currentCardId.Count == CurrentGameMode.CardsToMatch) {
+   
+        
+        if (currentCardId.Count == CurrentGameMode.CardsToMatch||currentCardId.Any(z=>z.ShowStats().ShowId()!= cardId.ShowStats().ShowId())) {
             isFool = true;
 
             if (currentCardId.All(x => x.ShowStats().ShowId() == cardId.ShowStats().ShowId()))
             {
+                
                 Debug.Log("Same Cards!"); 
                 CurrentGameMode.CardsInGame-= CurrentGameMode.CardsToMatch;
                 StartCoroutine(EnableCards());
-                
-              
 
             }
-            else { Debug.Log("Didnt Match!"); CurrentGameMode.mistakes--; }
-            foreach (var card in currentCardId) { card.ShowStats().ShowId(); }
-            foreach (var del in CurrentGameMode.eventDelgates) 
-            {
-                Debug.Log("Start Swipe");
-                del();
+            else 
+            { Debug.Log("Didnt Match!"); 
+                CurrentGameMode.mistakes--;
+                
+                foreach (var del in CurrentGameMode.eventDelgates) 
+                {
+                    del();
+                }
+                StartCoroutine(ResetCards());
             }
-            Debug.Log("End Swipe");
-            StartCoroutine(ResetCards());
-            
                        
-            
         }
-        return CurrentGameMode.IsContinueValid();
+        if (!CurrentGameMode.IsContinueValid())
+        {
+            StartCoroutine(WaitForCondition());
+        }
+
+        return true;
         
+    }
+  
+
+    private IEnumerator WaitForCondition()
+    {
+        yield return new WaitForSeconds(1.3f*CurrentGameMode.CardsToMatch);
+        //StopAllCoroutines();
+        CurrentGameMode.IsContinueValid();
     }
 
     private IEnumerator ResetCards()
     {
-        yield return new WaitForSeconds(0.3f);
-        foreach (CardScript card in currentCardId) { 
-
+            yield return new WaitForSeconds(0.3f);
+            foreach (CardScript card in currentCardId)
+            {
+            //card.GetComponent<BoxCollider>().enabled = true;
+                card.StartRotation(0f);
             card.GetComponent<BoxCollider>().enabled = true;
-            card.StartRotation(0f);
+            //CurrentGameMode.localCards.Add(card) ;
+            
+            }
+
+            foreach (CardScript card in currentCardId)
+        {
+            CurrentGameMode.localCards.Add(card);
         }
-        currentCardId.Clear();
+            currentCardId.Clear();
+        
         
         isFool = false;
 
@@ -203,58 +224,26 @@ public class GameManagerScript : MonoBehaviour
 
     private IEnumerator EnableCards()
     {
-        yield return new WaitForSeconds(0.3f);
+    
+            yield return new WaitForSeconds(0.3f);
+
         foreach (CardScript card in currentCardId) {
             //card.StartRotation(0f);
             StartCoroutine(card.MoveToFinalPos(finalPoint.transform.position.x));
-            if (CurrentGameMode.localCards!=null) { CurrentGameMode.localCards.Remove(card); }
-            //CurrentGameMode.localCards.Remove(card);
-            //Destroy(card);
+            
+            
         }
 
-        Debug.Log("Cards Destroyed");
+        //Debug.Log("Cards Destroyed");
         currentCardId.Clear();
         isFool = false;
 
         //StopAllCoroutines();
     }
+
+
     
 
-    /*private void InitCards(Vector2 cameraCenter)
-    {
-        Vector3 gameBoardVec = Vector3.one;
-        if (GameBoard)
-        {
-            Vector3 boardVec = GameBoard.transform.position;
-            gameBoardVec = new Vector3(boardVec.x, .1f, boardVec.z);
-
-           
-        }
-
-        Rect safeArea = Screen.safeArea;
-        Vector3 StartPos = new Vector3(safeArea.position.normalized.x, .1f, safeArea.position.normalized.y);
-
-        
-
-        for (int i = 0; i < CurrentGameMode.CardsInGame; i++)
-        {
-            for (int j = 0; j < CurrentGameMode.CardsToMatch; j++)
-            {
-                CardScript newCard = Instantiate(
-                    card,
-                   StartPos, 
-                    card.transform.rotation);
-                Debug.Log(newCard.transform.position);
-                newCard.ChangeMaterial(i);
-                Debug.Log(newCard.ShowStats().ShowId());
-                //startPosition.transform.position = newCard.transform.position;   
-            }
-            
-
-
-        }
-
-    }
-*/
+  
 
 }//Cards in vector

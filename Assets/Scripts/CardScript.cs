@@ -60,18 +60,20 @@ public class CardScript : MonoBehaviour, ICard
     /// </summary>
     private void OnMouseDown()
     {
-        if (GameManagerScript.Instance.isFool) return;
+        if (GameManagerScript.Instance.isFool)  return; 
         StartRotation(-180);
         Debug.Log(stats.ShowId());
 
         
         if (!GameManagerScript.Instance.IsMatch(this))
         {
+            //GameManagerScript.Instance.ClearAllID();
             Debug.Log("Game Over");
-          foreach(var card in PoolManager.Instance.cardsList)
+            //StopAllCoroutines();
+          /*foreach(var card in PoolManager.Instance.cardsList)
             {
                 PoolManager.Instance.ReleaseCard(card);
-            }
+            }*/
         }
         ;
     }
@@ -93,29 +95,33 @@ public class CardScript : MonoBehaviour, ICard
         float elapsedTime = 0f;
         Vector3 startingPosition = transform.position;
 
-        while (elapsedTime < duration)
+        while (elapsedTime < duration&&Vector3.Distance(startingPosition, targetPosition)!=0)
         {
             transform.position = Vector3.Lerp(startingPosition, targetPosition, elapsedTime / duration);
             elapsedTime += Time.deltaTime;
             yield return null;
         }
 
-        transform.position = targetPosition; 
+        transform.position = targetPosition;
+        GetComponent<BoxCollider>().enabled = true;
+        SaveManager.Instance.gameMode.localCards.Add(this);
+
+
     }
 
     public IEnumerator MoveToFinalPos(float x)
     {
-        while (true) 
+        Debug.Log("move to final");
+        while (x+0.5f < transform.position.x) 
         {
-            if (x < transform.position.x)
-            {
                 transform.position = Vector3.Lerp(transform.position,new Vector3(x, transform.position.y, transform.position.z), followDelay*followSpeed);
-            }
+            
             //PoolManager.Instance.ReleaseCard(this);
             yield return new WaitForSeconds(followDelay);
-        }
 
-        
+
+        }
+        gameObject.GetComponent<BoxCollider>().enabled = false;
     }
 
     private IEnumerator RotateRight(float targetZAngle)
@@ -140,6 +146,8 @@ public class CardScript : MonoBehaviour, ICard
     public void StartRotation(float targetZAngle)
     {
         //StopAllCoroutines();
+        
+
         StartCoroutine(RotateRight(targetZAngle));
     }
 
