@@ -10,7 +10,7 @@ public class PoolManager : MonoBehaviour
     public static PoolManager Instance {  get; private set; }
 
     public IObjectPool<CardScript> cardsPool { get; set; }
-
+    [SerializeField]
     public List<CardScript> cardsList;
 
     [SerializeField] private GameObject cardPrefab;
@@ -40,8 +40,10 @@ public class PoolManager : MonoBehaviour
     {
         GameObject card = Instantiate( cardPrefab );
         card.SetActive( false );
+        
         cardsList.Add(card.GetComponent<CardScript>());
-        return cardsList.Last();
+        card.transform.SetParent(transform);
+        return cardsList.Last(); 
     }
 
     private void OnGetFromPool(CardScript card)=>card.gameObject.SetActive( true );
@@ -51,7 +53,13 @@ public class PoolManager : MonoBehaviour
     private void OnDestroyPoolObject(CardScript card)=>Destroy(card.gameObject);
 
     public CardScript GetCard() {
-        return cardsPool.Get(); }
+        CardScript newCard = cardsPool.Get();
+
+        cardsList.Remove(newCard);
+        cardsList.Insert(0, newCard);
+
+        return newCard;
+    }
 
     public void ReleaseCard(CardScript card) {cardsPool.Release(card); }
 

@@ -41,7 +41,6 @@ public class Basic
     public int mistakes;
     public int SelectedCards;
 
-    private bool isJoker;
     public bool isSwipe;
 
     System.Random rng;
@@ -59,8 +58,8 @@ public class Basic
 
         eventDelgates = new List<EventDelegate>();
         localCards = new List<CardScript>();
-        Debug.Log(isSwipe + "swipe");
-
+        //Debug.Log(isSwipe + "swipe");
+        rng = new System.Random();
 
     }
 
@@ -68,9 +67,9 @@ public class Basic
     {
         if (isSwipe)
         {
-            eventDelgates.Add(AfterCardsInit);
+            //eventDelgates.Add(AfterCardsInit);
             eventDelgates.Add(Swipe);
-            rng = new System.Random();
+            
         }
 
     }
@@ -85,13 +84,13 @@ public class Basic
     public virtual void Swipe()
     {
         List<CardScript> shuffledCards = new List<CardScript>(localCards);
-        Shuffle(ref shuffledCards);
+        Shuffle(shuffledCards);
 
         shuffledCards = shuffledCards.Take(CardsToMatch).ToList();
 
         List<Vector3> targetPositions = shuffledCards.Select(card => card.transform.position).ToList();
 
-        Shuffle(ref targetPositions);
+        Shuffle(targetPositions);
         for (int i = 0; i < targetPositions.Count; i++)
         {
 
@@ -104,7 +103,7 @@ public class Basic
 
     }
 
-    private void Shuffle<T>(ref List<T> list)
+    public virtual void Shuffle<T>(IList<T> list)
     {
         
         int n = list.Count;
@@ -129,6 +128,16 @@ public class Basic
 
     }
 
+
+    public virtual void RestartGame()
+    {
+        CardsInGame = SelectedCards;
+        localCards.Clear();
+
+
+        (int, int) sides = GameManagerScript.Instance.MatrixSidesAnalizer(ref SelectedCards);
+        GameManagerScript.Instance.CreateCardsCoroutine(TableGrid.SpiralMatrixCards(sides.Item1, sides.Item2), PoolManager.Instance.cardsList);
+    }
 
 
     public delegate void EventDelegate();
@@ -161,14 +170,9 @@ public class Infinite : Basic
 
             if (GameManagerScript.Instance.isFool) return false;
 
-            PoolManager.Instance.ReleaseAllCards();
+            //PoolManager.Instance.ReleaseAllCards();
             Debug.Log("Selected cards" + SelectedCards);
-            CardsInGame = SelectedCards;
-
-
-            (int, int) sides = GameManagerScript.Instance.MatrixSidesAnalizer(SelectedCards);
-            GameManagerScript.Instance.CreateCards(TableGrid.SpiralMatrixCards(sides.Item1, sides.Item2));
-            AfterCardsInit();
+            base.RestartGame();
             return false;
         }
 

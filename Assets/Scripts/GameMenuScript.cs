@@ -12,7 +12,25 @@ public class GameMenuScript:MonoBehaviour
 
     public void OptionsButton() => Debug.LogWarning("NotEnplemetedSectionOptions");
 
-    public void BackToMenuButton() => Debug.LogWarning("NotEnplemetedSectionBackMenu");
+    public void BackToMenuButton() {
+        int activeCards = PoolManager.Instance.cardsList.Count - PoolManager.Instance.cardsPool.CountInactive;
 
-    public void Restart() => SceneManager.LoadScene("SampleScene");
+        var poolCards = PoolManager.Instance.cardsList;
+       for (int i = 0; i < activeCards; i++) { 
+
+            poolCards[i].StartRotation(0f);
+            poolCards[i].transform.position = Vector3.zero;
+            PoolManager.Instance.ReleaseCard(poolCards[i]);
+        }
+        
+        //PoolManager.Instance.ReleaseAllCards();
+        SceneManager.LoadScene("SelectionMenu");
+    }
+
+    public void Restart() { 
+        
+        GameManagerScript.Instance.GameModeRestart();
+        MenuDesc.SetActive(false);
+    
+    }
 }

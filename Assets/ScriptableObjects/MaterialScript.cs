@@ -14,7 +14,7 @@ public class MaterialScript : ScriptableObject
 
     public Texture2D[] InitFolder()
     {
-        if (path == "") path = "png/BaseCards/blue";
+        if (path == ""||path==null) path = "png/BaseCards/blue";
 
         Debug.Log(path + "patj");
         images = Resources.LoadAll<Texture2D>(SplitSource(path));

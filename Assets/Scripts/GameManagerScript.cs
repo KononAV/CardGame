@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class GameManagerScript : MonoBehaviour
 {
@@ -19,8 +20,8 @@ public class GameManagerScript : MonoBehaviour
     [SerializeField] private GameObject finalPoint;
 
     private Texture2D[] textures;
+    private MeshCollider BoardProtecter;
 
-    private bool isJokerHere;
     public bool isFool { get; private set; }
 
 
@@ -34,13 +35,13 @@ public class GameManagerScript : MonoBehaviour
     public static GameManagerScript Instance { get; private set; }
 
     private void Awake()
-    {
+    {/*
         if(Instance != null && Instance != this)
         {
             Destroy(Instance);
             return;
         }
-
+*/
         Instance = this;
 
         //DontDestroyOnLoad(gameObject);
@@ -69,14 +70,13 @@ public class GameManagerScript : MonoBehaviour
     }
      void Start()
      {
-       
-        
+
+        BoardProtecter = GameObject.Find("BoardProtecter").GetComponent<MeshCollider>();
         finalPoint.transform.position = TrashPlaceInit();
 
         
         isFool = false;
         textures = SaveManager.Instance.saveMaterial;
-        isJokerHere = false;
         CurrentGameMode = SaveManager.Instance.gameMode;
         CurrentGameMode.InitModeFitures();  
         if (MainCamera)
@@ -89,25 +89,25 @@ public class GameManagerScript : MonoBehaviour
         }
         Debug.Log(CurrentGameMode.CardsInGame);
         CurrentGameMode.CardsInGame = CurrentGameMode.SelectedCards;
-        (int, int) sides = MatrixSidesAnalizer(CurrentGameMode.CardsInGame);
-        CreateCards(TableGrid.SpiralMatrixCards(sides.Item1, sides.Item2));
+        (int, int) sides = MatrixSidesAnalizer(ref CurrentGameMode.CardsInGame);
+        TakeAllCards(CurrentGameMode.CardsInGame);
+        CreateCardsCoroutine(TableGrid.SpiralMatrixCards(sides.Item1, sides.Item2), PoolManager.Instance.cardsList);
         
-        if (CurrentGameMode.eventDelgates.Count != 0)
+        /*if (CurrentGameMode.eventDelgates.Count != 0)
         {
-            CurrentGameMode.eventDelgates[0]();
+            //CurrentGameMode.eventDelgates[0]();
             CurrentGameMode.eventDelgates.RemoveAt(0);
-        }
+        }*/
 
      }
 
-    public (int,int) MatrixSidesAnalizer(int square)
+    public (int,int) MatrixSidesAnalizer(ref int square)
     {
         Debug.Log(square+"sqare");
-        if (square % 2 != 0)
+        /*if (square % 2 != 0)
         {
-            isJokerHere = true;
             square -= 1;
-        }
+        }*/
         ( int x,int y) tuple = (0,0);
         if (square <= 10)
         {
@@ -122,15 +122,71 @@ public class GameManagerScript : MonoBehaviour
         return tuple;   
     }
 
-    public void WholePoleInit()
-    {
-        CreateCards(TableGrid.SpiralMatrixCards(4, 4));
+  
 
+    public void TakeAllCards(int count)
+    {
+        for (int i = 0; i < count; i++) {
+
+            CardScript newCard = PoolManager.Instance.GetCard();
+
+        }
     }
 
+    
+    public void CreateCardsCoroutine(Vector3[] vectorArray, List<CardScript> cards)
+    {
+        CurrentGameMode.Shuffle(vectorArray);
+        StartCoroutine(CreateCards());
+        
+        IEnumerator CreateCards()
+        {
+            for (int i = 0; i < vectorArray.Length / 2; i++)
+            {
+                int newId = (i + textures.Length) % textures.Length;
 
- 
-    public void CreateCards(in Vector3[] vectorArray)
+                for (int j = 0; j < CurrentGameMode.CardsToMatch; j++)
+                {
+                    Debug.Log(newId);
+                    CardScript newCard = cards[i * CurrentGameMode.CardsToMatch + j];
+                    newCard.StartRotation(180f);
+
+                    newCard.ChangeMaterial(newId, textures[newId]);
+                    newCard.StartChange(vectorArray[i * CurrentGameMode.CardsToMatch + j]);
+                    
+
+                   
+                }
+                yield return new WaitForSeconds(1.3f);
+
+                for(int j = 0; j<CurrentGameMode.CardsToMatch; j++)
+                {
+                    CurrentGameMode.localCards[i * CurrentGameMode.CardsToMatch + j].StartRotation(0f);
+                }
+
+            }
+                if (vectorArray.Length%2!=0)
+                {
+                    CardScript newCard = cards[vectorArray.Length-1];
+                    newCard.transform.rotation = card.transform.rotation;
+                    newCard.ChangeMaterial(-1, Resources.Load<Texture2D>("png/StarAnimals/croco"));
+                    newCard.StartChange(vectorArray[vectorArray.Length-1]);
+                }
+            BoardProtecter.enabled = false;
+
+        }
+    }
+
+   
+    public void GameModeRestart()
+    {
+        StopAllCoroutines();
+        CurrentGameMode.RestartGame();
+    }
+   
+
+
+   /* public void CreateCards(in Vector3[] vectorArray, in List<CardScript> cards)
     {
 
         for(int i = 0; i< vectorArray.Length/2; i++)
@@ -139,15 +195,21 @@ public class GameManagerScript : MonoBehaviour
             for (int j = 0; j < CurrentGameMode.CardsToMatch; j++)
             {
                 Debug.Log(newId);
-                CardScript newCard = PoolManager.Instance.GetCard();
-                newCard.transform.position = vectorArray[i * CurrentGameMode.CardsToMatch + j];
+                CardScript newCard = cards[i * CurrentGameMode.CardsToMatch + j];
+                //
+                //newCard.GetComponent<BoxCollider>().enabled = true;
+                //newCard.transform.position = vectorArray[i * CurrentGameMode.CardsToMatch + j];
+                //
                 newCard.transform.rotation = card.transform.rotation;
                 newCard.ChangeMaterial( newId,textures[newId]);
+                newCard.StartChange(vectorArray[i * CurrentGameMode.CardsToMatch + j]);
+                
             }
+            StartCoroutine(WaitForCondition(5f));
 
         }
         
-    }
+    }*/
 
 
     public bool IsMatch(CardScript cardId)
@@ -183,17 +245,20 @@ public class GameManagerScript : MonoBehaviour
         }
         if (!CurrentGameMode.IsContinueValid())
         {
-            StartCoroutine(WaitForCondition());
+            BoardProtecter.enabled = true;
+
+            StartCoroutine(WaitForCondition(1.3f * CurrentGameMode.CardsToMatch));
+            
         }
 
-        return true;
+        return CurrentGameMode.IsContinueValid();
         
     }
   
 
-    private IEnumerator WaitForCondition()
+    private IEnumerator WaitForCondition(float waitingRate)
     {
-        yield return new WaitForSeconds(1.3f*CurrentGameMode.CardsToMatch);
+        yield return new WaitForSeconds(waitingRate);
         //StopAllCoroutines();
         CurrentGameMode.IsContinueValid();
     }
