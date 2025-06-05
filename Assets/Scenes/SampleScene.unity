@@ -1368,6 +1368,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MenuDesc: {fileID: 1334626882}
+  scores: 0
+  pairs: 0
+  total: 0
 --- !u!1 &868939425
 GameObject:
   m_ObjectHideFlags: 0
@@ -1669,13 +1672,13 @@ MonoBehaviour:
       - m_Target: {fileID: 858281092}
         m_TargetAssemblyTypeName: GameMenuScript, Assembly-CSharp
         m_MethodName: Restart
-        m_Mode: 1
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: MenuPanel
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &1007452327
@@ -1763,6 +1766,7 @@ MonoBehaviour:
   card: {fileID: 4543893722041772500, guid: 4f34f094d7a206d4da5144248e48fe62, type: 3}
   startPosition: {fileID: 1622708846}
   finalPoint: {fileID: 1315841606}
+  endScreen: {fileID: 868939425}
   MainCamera: {fileID: 330585545}
   GameBoard: {fileID: 313537955}
 --- !u!1 &1295570977
@@ -3818,13 +3822,13 @@ MonoBehaviour:
       - m_Target: {fileID: 858281092}
         m_TargetAssemblyTypeName: GameMenuScript, Assembly-CSharp
         m_MethodName: Restart
-        m_Mode: 1
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: EndOfGame
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &2135241069

@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -18,9 +20,53 @@ public class SelectionMenuScript : MonoBehaviour
 
     private void Awake()
     {
-        _card = Instantiate(card,new Vector3(4,4.4f,-5.5f), card.transform.rotation);
 
+        SaveManager.Instance.safeArea = Screen.safeArea;
+        _card = Instantiate(card,MenuCardInit(FindAnyObjectByType<Camera>()), card.transform.rotation);
         
+        InitStylesForCards();
+        
+
+
+    }
+
+    private Vector3 MenuCardInit(Camera MainCamera)
+    {
+        float x = 0.8f; // 1/4 левее от правого края
+        float y = 0.7f;  // середина по высоте
+        float distanceFromCamera = 10f; // глубина (настроить под камеру)
+
+        Vector3 worldPos = MainCamera.ViewportToWorldPoint(new Vector3(x, y, distanceFromCamera));
+
+        // (опционально) фиксируем Z для XZ-плоскости
+        worldPos.z = -2f;
+
+        return worldPos;
+    }
+
+
+    private void InitStylesForCards()
+    {
+        GameObject[] styles = GameObject.FindGameObjectsWithTag("StyleSelection");
+
+        if (SaveManager.Instance.saveProgressInstance.savedTextures == null) return;
+        HashSet<string> usedStyleNames = new HashSet<string>(
+            SaveManager.Instance.saveProgressInstance.savedTextures
+            .Select(x => Path.GetDirectoryName(x.Replace("png/", "")))
+            .ToArray());
+
+
+        foreach (GameObject style in styles)
+        {
+            if (style == null) continue;
+
+            if (!usedStyleNames.Contains(style.name))
+            {
+                style.SetActive(false);
+            }
+        }
+
+
     }
 
     private void Start()
@@ -32,7 +78,6 @@ public class SelectionMenuScript : MonoBehaviour
 
             slider.value = gameMode.SelectedCards;
         }
-        
     }
 
     public void SelectedStyle(string imageSource) { 

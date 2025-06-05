@@ -1,10 +1,14 @@
+using System.IO;
 using UnityEngine;
+
+
 
 public class SaveManager : MonoBehaviour
 {
     public Basic gameMode;
     public Texture2D[] saveMaterial;
     public Rect safeArea;
+    [SerializeField] public SaveProgress saveProgressInstance;
 
 
     public static SaveManager Instance { get; set; }
@@ -19,6 +23,7 @@ public class SaveManager : MonoBehaviour
         }
         Instance = this;
         DontDestroyOnLoad(gameObject);
+
     }
 
     void Start()
@@ -27,4 +32,8 @@ public class SaveManager : MonoBehaviour
         safeArea = Screen.safeArea;
 
     }
+
+
+
 }
+

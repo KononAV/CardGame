@@ -3,7 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,6 +19,8 @@ public class GameManagerScript : MonoBehaviour
 
     [SerializeField] private GameObject finalPoint;
 
+    [SerializeField] private GameObject endScreen;
+
     private Texture2D[] textures;
     private MeshCollider BoardProtecter;
 
@@ -26,6 +28,8 @@ public class GameManagerScript : MonoBehaviour
 
 
     private Basic CurrentGameMode;
+    private float scores;
+    private int pairs;
 
     [SerializeField]private Camera MainCamera;
     [SerializeField] private GameObject GameBoard;
@@ -51,6 +55,8 @@ public class GameManagerScript : MonoBehaviour
     }
 
 
+
+   
     private Vector3 TrashPlaceInit()
     {
         Rect safeArea =  SaveManager.Instance.safeArea;
@@ -68,9 +74,8 @@ public class GameManagerScript : MonoBehaviour
         float width = maxPos.x - worldPos.x;
         return new Vector3(worldPos.x+width/15f, 0, worldPos.z);
     }
-     void Start()
+    void Start()
      {
-
         BoardProtecter = GameObject.Find("BoardProtecter").GetComponent<MeshCollider>();
         finalPoint.transform.position = TrashPlaceInit();
 
@@ -161,7 +166,7 @@ public class GameManagerScript : MonoBehaviour
 
                 for(int j = 0; j<CurrentGameMode.CardsToMatch; j++)
                 {
-                    CurrentGameMode.localCards[i * CurrentGameMode.CardsToMatch + j].StartRotation(0f);
+                    cards[i * CurrentGameMode.CardsToMatch + j].StartRotation(0f);
                 }
 
             }
@@ -180,6 +185,11 @@ public class GameManagerScript : MonoBehaviour
    
     public void GameModeRestart()
     {
+        scores = pairs = 0;
+        for(int i =0; i < CurrentGameMode.SelectedCards; i++)
+        {
+            PoolManager.Instance.cardsList[i].StartRotation(0f);
+        }
         StopAllCoroutines();
         CurrentGameMode.RestartGame();
     }
@@ -225,14 +235,16 @@ public class GameManagerScript : MonoBehaviour
 
             if (currentCardId.All(x => x.ShowStats().ShowId() == cardId.ShowStats().ShowId()))
             {
-                
+                pairs += 1;
+                scores += pairs * 1.5f + CurrentGameMode.scoresRate;
                 Debug.Log("Same Cards!"); 
                 CurrentGameMode.CardsInGame-= CurrentGameMode.CardsToMatch;
                 StartCoroutine(EnableCards());
 
             }
             else 
-            { Debug.Log("Didnt Match!"); 
+            { Debug.Log("Didnt Match!");
+                scores -= 3.25f;
                 CurrentGameMode.mistakes--;
                 
                 foreach (var del in CurrentGameMode.eventDelgates) 
@@ -249,6 +261,8 @@ public class GameManagerScript : MonoBehaviour
 
             StartCoroutine(WaitForCondition(1.3f * CurrentGameMode.CardsToMatch));
             
+            
+            
         }
 
         return CurrentGameMode.IsContinueValid();
@@ -260,7 +274,10 @@ public class GameManagerScript : MonoBehaviour
     {
         yield return new WaitForSeconds(waitingRate);
         //StopAllCoroutines();
-        CurrentGameMode.IsContinueValid();
+        //CurrentGameMode.IsContinueValid();
+        SaveManager.Instance.saveProgressInstance.Save(total: scores, pairs: pairs);
+        CurrentGameMode.EndScreen(ref scores ,ref scores,ref pairs,in endScreen);
+
     }
 
     private IEnumerator ResetCards()
@@ -306,9 +323,12 @@ public class GameManagerScript : MonoBehaviour
         //StopAllCoroutines();
     }
 
+    public void OnParticleSystemStopped()
+    {
+            StopAllCoroutines();
+    }
 
-    
 
-  
+
 
 }//Cards in vector

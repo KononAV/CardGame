@@ -5,6 +5,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Threading.Tasks;
+using TMPro;
 
 
 public enum Modes
@@ -40,7 +41,7 @@ public class Basic
     public bool isInfinite;
     public int mistakes;
     public int SelectedCards;
-
+    public float scoresRate;
     public bool isSwipe;
 
     System.Random rng;
@@ -55,7 +56,7 @@ public class Basic
         this.CardsInGame = SelectedCards;
         this.isInfinite = isInfinite;
         this.mistakes = mistakes;
-
+        scoresRate = 10;
         eventDelgates = new List<EventDelegate>();
         localCards = new List<CardScript>();
         //Debug.Log(isSwipe + "swipe");
@@ -69,6 +70,7 @@ public class Basic
         {
             //eventDelgates.Add(AfterCardsInit);
             eventDelgates.Add(Swipe);
+            scoresRate += 5;
             
         }
 
@@ -140,12 +142,36 @@ public class Basic
     }
 
 
+    public virtual void EndScreen(ref float total ,ref float scores, ref int pairs, in GameObject screen)
+    {
+
+
+        screen.SetActive(true);
+        TextMeshProUGUI scoresText = GameObject.Find("Scores")?.GetComponent<TextMeshProUGUI>();
+        scoresText.text = $"Scores: {scores}";
+
+        TextMeshProUGUI pairText = GameObject.Find("Pairs")?.GetComponent<TextMeshProUGUI>();
+        pairText.text = $"Pairs: {pairs}";
+
+        TextMeshProUGUI totalText = GameObject.Find("Total")?.GetComponent<TextMeshProUGUI>();
+        totalText.text = $"Total: {total}";
+
+        total = scores = pairs = 0;
+
+    }
+
+
+
+
     public delegate void EventDelegate();
 }
 
 public class Mistake : Basic
 {
-    public Mistake(int cardsToMatch, bool isInfinite, int mistakes) : base(cardsToMatch, isInfinite, mistakes) { }
+    public Mistake(int cardsToMatch, bool isInfinite, int mistakes) : base(cardsToMatch, isInfinite, mistakes) 
+    {
+        scoresRate = 15;
+    }
 
     public override bool IsContinueValid()
     {
@@ -171,13 +197,19 @@ public class Infinite : Basic
             if (GameManagerScript.Instance.isFool) return false;
 
             //PoolManager.Instance.ReleaseAllCards();
-            Debug.Log("Selected cards" + SelectedCards);
-            base.RestartGame();
+            /*Debug.Log("Selected cards" + SelectedCards);
+            base.RestartGame();*/
             return false;
         }
 
 
         return true;
+    }
+
+    public override void EndScreen(ref float total,ref float scores,ref int pairs, in GameObject screen=null)
+    {
+        Debug.Log("Selected cards" + SelectedCards);
+        base.RestartGame();
     }
 
 }
