@@ -1,3 +1,5 @@
+using NUnit.Framework;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
@@ -7,7 +9,9 @@ public class SaveProgress : ScriptableObject
 {
     [SerializeField] public float pairs;
     [SerializeField] public float total;
-    [SerializeField] public string[] savedTextures;
+    [SerializeField] public HashSet<string> savedTextures;
+
+    [SerializeField] public HashSet<string> savedArchives;
 
     private static string SavePath => Path.Combine(Application.persistentDataPath, "save.json");
 
@@ -16,7 +20,9 @@ public class SaveProgress : ScriptableObject
     {
         public float pairs;
         public float total;
-        public string[] savedTextures;
+        public string[] savedTextures; 
+        public string[] savedArchives;
+
     }
 
     public void LoadData()
@@ -35,39 +41,42 @@ public class SaveProgress : ScriptableObject
     {
         pairs = data.pairs;
         total = data.total;
-        savedTextures = data.savedTextures ?? new string[0];
+        savedTextures = (data.savedTextures ?? new string[0]).ToHashSet();
+        savedArchives = (data.savedArchives ?? new string[0]).ToHashSet();
     }
 
-    public void Save(float pairs=0f, float total=0f)
+    public void Save(float pairs = 0f, float total = 0f)
     {
         this.pairs += pairs;
         this.total += total;
-        
 
-        string json = JsonUtility.ToJson(this);
+        var data = new SaveData
+        {
+            pairs = this.pairs,
+            total = this.total,
+            savedTextures = this.savedTextures?.ToArray() ?? new string[0],
+            savedArchives = this.savedArchives?.ToArray() ?? new string[0]
+        };
+
+        string json = JsonUtility.ToJson(data);
         File.WriteAllText(SavePath, json);
     }
 
     public void AddTexture(string path)
     {
         if (savedTextures == null)
-        {
-            savedTextures = new string[] { path };
-            return;
-        }
-        if (savedTextures.Contains(path)) return;
-        string[] newTexturesArray = new string[savedTextures.Length + 1];
-        savedTextures.CopyTo(newTexturesArray, 0);
-        newTexturesArray[^1] = path;
-        savedTextures = newTexturesArray;
-        Save();
+            savedTextures = new HashSet<string>();
+
+        if (savedTextures.Add(path))
+            Save();
     }
 
     public void ClearSave()
     {
         this.pairs = 0f;
         this.total = 0f;
-        this.savedTextures = new string[0];
+        this.savedTextures = new HashSet<string>();
+        this.savedArchives = new HashSet<string>();
         Save();
     }
 }

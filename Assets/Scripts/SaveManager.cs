@@ -29,6 +29,8 @@ public class SaveManager : MonoBehaviour
     void Start()
     {
         //gameMode = GameMode.GameModeSelector(0);
+        AchivmentsSO.SetMono(this);
+
         safeArea = Screen.safeArea;
 
     }

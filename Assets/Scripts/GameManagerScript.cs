@@ -236,6 +236,10 @@ public class GameManagerScript : MonoBehaviour
             if (currentCardId.All(x => x.ShowStats().ShowId() == cardId.ShowStats().ShowId()))
             {
                 pairs += 1;
+
+                AchivmentsSO.gameEvents.TryGetValue("FirstTenPairs", out Action<object> action);
+                action?.Invoke(SaveManager.Instance.saveProgressInstance.pairs+pairs);
+
                 scores += pairs * 1.5f + CurrentGameMode.scoresRate;
                 Debug.Log("Same Cards!"); 
                 CurrentGameMode.CardsInGame-= CurrentGameMode.CardsToMatch;
@@ -260,6 +264,9 @@ public class GameManagerScript : MonoBehaviour
             BoardProtecter.enabled = true;
 
             StartCoroutine(WaitForCondition(1.3f * CurrentGameMode.CardsToMatch));
+
+            AchivmentsSO.gameEvents.TryGetValue("FirstPlay", out Action<object> action);
+            action?.Invoke(null);
             
             
             

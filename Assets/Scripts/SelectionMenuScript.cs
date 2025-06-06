@@ -32,13 +32,11 @@ public class SelectionMenuScript : MonoBehaviour
 
     private Vector3 MenuCardInit(Camera MainCamera)
     {
-        float x = 0.8f; // 1/4 левее от правого края
-        float y = 0.7f;  // середина по высоте
-        float distanceFromCamera = 10f; // глубина (настроить под камеру)
+        float x = 0.8f; 
+        float y = 0.7f;  
+        float distanceFromCamera = 10f;
 
         Vector3 worldPos = MainCamera.ViewportToWorldPoint(new Vector3(x, y, distanceFromCamera));
-
-        // (опционально) фиксируем Z для XZ-плоскости
         worldPos.z = -2f;
 
         return worldPos;
