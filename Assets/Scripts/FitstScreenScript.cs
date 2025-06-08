@@ -8,7 +8,7 @@ public class FitstScreenScript : MonoBehaviour
     private void Start()
     {
         
-        SaveManager.Instance.saveProgressInstance.LoadData();//SaveManager.Instance.saveProgressInstance.ClearSave(); 
+        SaveManager.Instance.saveProgressInstance.LoadData();SaveManager.Instance.saveProgressInstance.ClearSave(); 
         SaveManager.Instance.saveProgressInstance.Save(total:100);
 
         AchivmentsSO.InitAllAchivments();
