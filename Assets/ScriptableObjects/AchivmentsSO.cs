@@ -6,6 +6,7 @@ using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
+using DG.Tweening;
 
 [CreateAssetMenu(fileName = "AchivmentsSO", menuName = "Scriptable Objects/AchivmentsSO")]
 public class AchivmentsSO : ScriptableObject
@@ -20,6 +21,7 @@ public class AchivmentsSO : ScriptableObject
     private static GameObject canvas;
 
     private static MonoBehaviour mono;
+    private static DG.Tweening.Sequence animation;
 
 
 
@@ -36,7 +38,7 @@ public class AchivmentsSO : ScriptableObject
                     DeleteFromDict("FirstStep");
                     GameEvents.TextureEvent("png/BaseCards/blue");
 
-                    mono.StartCoroutine(UIArchive(name:"First Step", description:"enter game", icon: null));
+                    mono.StartCoroutine(UIArchive(name:"First Step", description:"enter the game", icon: null));
 
                 } },
             {"FirstPlay",
@@ -98,7 +100,7 @@ public class AchivmentsSO : ScriptableObject
     {
         canvas = GameObject.Find("Canvas").gameObject;
 
-        var newArchive = Instantiate(archivePref, InstancePos, archivePref.transform.rotation);
+        var newArchive = Instantiate(archivePref, new Vector3(InstancePos.x, InstancePos.y+100, InstancePos.z), archivePref.transform.rotation);
         DontDestroyOnLoad(newArchive);
 
         newArchive.transform.SetParent(canvas.transform, true);
@@ -113,12 +115,36 @@ public class AchivmentsSO : ScriptableObject
         var Image = newArchive.transform.Find("ArchiveIcon")?.GetComponent<Image>();
         Image.sprite = icon;
 
-        yield return new WaitForSeconds(2f);
+        newArchive.TryGetComponent<CanvasGroup>(out var canvasGroup);
+        canvasGroup.alpha = 0;
+        
+        
         if(newArchive!=null)
-        mono.StartCoroutine(DestroyArchive(newArchive.GetComponent<CanvasGroup>()));
+        ShowAnim(newArchive.transform, canvasGroup);
+
+        yield return null;
+        //mono.StartCoroutine(DestroyArchive(newArchive.GetComponent<CanvasGroup>()));
     }
 
-    private static IEnumerator DestroyArchive(CanvasGroup canvasGroup)
+
+
+    private static void ShowAnim(in Transform transform,CanvasGroup canvasGroup)
+    {
+        animation = DOTween.Sequence();
+        animation.Append(transform?.DOMoveY(InstancePos.y, 2f).SetEase(Ease.Linear)).Join(canvasGroup?.DOFade(1, 5f)).OnComplete(()=> DestroyArchive(canvasGroup));
+        //animation.Play();
+        
+    }
+
+ 
+
+    private static void DestroyArchive(CanvasGroup canvasGroup)
+    {
+        animation = DOTween.Sequence();
+
+        animation.Append(canvasGroup.DOFade(0, 5f)).OnComplete(()=>Destroy(canvasGroup.gameObject));
+    }
+    /*private static IEnumerator DestroyArchive(CanvasGroup canvasGroup)
     {
       
         while (canvasGroup != null&&canvasGroup.alpha > 0.1f)
@@ -132,7 +158,7 @@ public class AchivmentsSO : ScriptableObject
 
         Destroy(canvasGroup.gameObject);
 
-    }
+    }*/
 }
 
 
@@ -144,7 +170,6 @@ public static class GameEvents
         
         SaveManager.Instance.saveProgressInstance.AddTexture(path);
    }
-
 
 }
 

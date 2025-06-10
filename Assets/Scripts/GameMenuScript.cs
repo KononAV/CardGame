@@ -10,13 +10,24 @@ public class GameMenuScript:MonoBehaviour
     [SerializeField] private float pairs;
     [SerializeField] private float total;
 
-    public void PauseButton() => MenuDesc.SetActive(true);
+    public void PauseButton() { 
+        
+        MenuDesc.SetActive(true);
+        Time.timeScale = 0f;
+    
+    }
 
-    public void ContinueButton() => MenuDesc.SetActive(false);
+    public void ContinueButton()
+    {
+        MenuDesc.SetActive(false);
+        Time.timeScale = 1f;
+    }
 
     public void OptionsButton() => Debug.LogWarning("NotEnplemetedSectionOptions");
 
     public void BackToMenuButton() {
+        Time.timeScale = 1f;
+
         GameManagerScript.Instance.StopAllCoroutines();
         int activeCards = PoolManager.Instance.cardsList.Count - PoolManager.Instance.cardsPool.CountInactive;
 
@@ -32,8 +43,9 @@ public class GameMenuScript:MonoBehaviour
         SceneManager.LoadScene("SelectionMenu");
     }
 
-    public void Restart(string name) { 
-        
+    public void Restart(string name) {
+        Time.timeScale = 1f;
+
         GameManagerScript.Instance.GameModeRestart();
         GameObject.Find(name).SetActive(false);
     
