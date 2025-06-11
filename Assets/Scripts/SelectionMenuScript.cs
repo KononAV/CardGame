@@ -117,7 +117,8 @@ public class SelectionMenuScript : MonoBehaviour
         
         SaveManager.Instance.gameMode.SelectedCards = (int)slider.value;
 
-        SceneManager.LoadScene("SampleScene");
+
+        SceneTransition.SwithToScene("SampleScene");
 
     }
 

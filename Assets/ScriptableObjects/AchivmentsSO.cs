@@ -131,7 +131,7 @@ public class AchivmentsSO : ScriptableObject
     private static void ShowAnim(in Transform transform,CanvasGroup canvasGroup)
     {
         animation = DOTween.Sequence();
-        animation.Append(transform?.DOMoveY(InstancePos.y, 2f).SetEase(Ease.Linear)).Join(canvasGroup?.DOFade(1, 5f)).OnComplete(()=> DestroyArchive(canvasGroup));
+        animation.Append(transform?.DOMoveY(InstancePos.y, 2f).SetEase(Ease.Linear)).Join(canvasGroup?.DOFade(1, 5f)).OnComplete(()=> DestroyArchive(canvasGroup)).Play();
         //animation.Play();
         
     }
@@ -142,7 +142,7 @@ public class AchivmentsSO : ScriptableObject
     {
         animation = DOTween.Sequence();
 
-        animation.Append(canvasGroup.DOFade(0, 5f)).OnComplete(()=>Destroy(canvasGroup.gameObject));
+        animation.Append(canvasGroup.DOFade(0, 5f)).OnComplete(()=>Destroy(canvasGroup.gameObject)).Play();
     }
     /*private static IEnumerator DestroyArchive(CanvasGroup canvasGroup)
     {

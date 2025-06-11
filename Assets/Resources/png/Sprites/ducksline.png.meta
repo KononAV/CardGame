@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: fcf602439e908fb4bba1c2f9bb3c179d
+guid: 1dcae00d95abf464d82806b06784ff0a
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -21,7 +21,7 @@ TextureImporter:
     heightScale: 0.25
     normalMapFilter: 0
     flipGreenChannel: 0
-  isReadable: 0
+  isReadable: 1
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
@@ -136,13 +136,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: ScaleTest_0
+      name: ducksline_0
       rect:
         serializedVersion: 2
-        x: 576
-        y: 487
-        width: 779
-        height: 227
+        x: 0
+        y: 0
+        width: 1548
+        height: 113
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -151,8 +151,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: cf8433e89730eb449a6ff36cd3da96b8
-      internalID: -1647608571
+      spriteID: 8fdb396e17ee3804fb7870a6ffa405f0
+      internalID: -1554281699
       vertices: []
       indices: 
       edges: []
@@ -161,7 +161,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 28c84319bbb359f4c833cde2af8c80cc
+    spriteID: f5b24fe670baf784e91418d9aa47c886
     internalID: 0
     vertices: []
     indices: 
@@ -171,7 +171,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      ScaleTest_0: -1647608571
+      ducksline_0: -1554281699
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

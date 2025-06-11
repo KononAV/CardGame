@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 2d585f5260e94434aaaf5fe9bcb47421
+guid: 0129bfc0e5bb99047b3aded730c456ef
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -136,13 +136,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: duckfont_0
+      name: pausemenu_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 1359
-        height: 678
+        width: 1380
+        height: 682
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -151,8 +151,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 54c23d57fa6665844a59db3c50369f6f
-      internalID: -686763825
+      spriteID: 70dfb93446b13ea4f91773228f90b857
+      internalID: 214830660
       vertices: []
       indices: 
       edges: []
@@ -161,7 +161,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 30107c4fda92354488f911e29519c26f
+    spriteID: 215cbd1f8e51ac84eb2a04f616ca7a31
     internalID: 0
     vertices: []
     indices: 
@@ -171,7 +171,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      duckfont_0: -686763825
+      pausemenu_0: 214830660
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

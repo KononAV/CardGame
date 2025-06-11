@@ -13,13 +13,13 @@ public class FitstScreenScript : MonoBehaviour
 
     [SerializeField] GameObject _startText;
     [SerializeField] RawImage _startImage;
+    //[SerializeField] SceneTra neTransition;
     private Sequence _startAnimation;
 
 
     private void Start()
     {
         StartImageInit();
-
 
         StartCoroutine(StartAnimation(_startText.transform, _startText.GetComponent<TextMeshProUGUI>()));
         SaveManager.Instance.saveProgressInstance.LoadData();SaveManager.Instance.saveProgressInstance.ClearSave(); 
@@ -44,7 +44,7 @@ public class FitstScreenScript : MonoBehaviour
 
     private IEnumerator StartAnimation(Transform transform, TextMeshProUGUI text) {
         _startAnimation = DOTween.Sequence();
-         _startAnimation.Append(transform.DOScale(0.7f, 5f)).Join(text.DOFade(0.1f, 5f)).SetLoops(-1,LoopType.Yoyo);
+         _startAnimation.Append(transform.DOScale(0.7f, 5f)).Join(text.DOFade(0.1f, 5f)).SetLoops(-1,LoopType.Yoyo).Play();
         yield break; 
     }
    
@@ -55,13 +55,14 @@ public class FitstScreenScript : MonoBehaviour
 
 
 
-        SceneManager.LoadScene("SelectionMenu");
+        //SceneManager.LoadScene("SelectionMenu");
     }
 
     private void Update()
     {
         if (Input.touchCount == 1)
         {
+            SceneTransition.SwithToScene("SelectionMenu");
             StartFreePlay();
         }
     }

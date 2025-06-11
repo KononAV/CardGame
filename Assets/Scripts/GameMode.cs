@@ -133,6 +133,7 @@ public class Basic
 
     public virtual void RestartGame()
     {
+        
         CardsInGame = SelectedCards;
         localCards.Clear();
 
@@ -156,7 +157,6 @@ public class Basic
         TextMeshProUGUI totalText = GameObject.Find("Total")?.GetComponent<TextMeshProUGUI>();
         totalText.text = $"Total: {total}";
 
-        total = scores = pairs = 0;
 
     }
 
@@ -177,7 +177,19 @@ public class Mistake : Basic
     {
         Debug.Log("Mistake");
 
-        return mistakes > 0;
+        return mistakes > 0&&CardsInGame>=CardsToMatch;
+    }
+
+    public override void EndScreen(ref float total, ref float scores, ref int pairs, in GameObject screen)
+    {
+
+
+        base.EndScreen(ref total, ref scores, ref pairs, in screen);
+        if (mistakes <= 0)
+        {
+            total = scores = pairs = 0;
+        }
+
     }
 
 

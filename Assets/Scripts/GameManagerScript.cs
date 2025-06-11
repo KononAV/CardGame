@@ -17,9 +17,15 @@ public class GameManagerScript : MonoBehaviour
 
     [SerializeField] private GameObject startPosition;
 
-    [SerializeField] private GameObject finalPoint;
+    [SerializeField] private Vector3 finalPoint;
 
     [SerializeField] private GameObject endScreen;
+
+    
+    [SerializeField] private GameObject GameBoard;
+
+    private Vector3 deckPlace;
+
 
     private Texture2D[] textures;
     private MeshCollider BoardProtecter;
@@ -31,8 +37,7 @@ public class GameManagerScript : MonoBehaviour
     private float scores;
     private int pairs;
 
-    [SerializeField]private Camera MainCamera;
-    [SerializeField] private GameObject GameBoard;
+    
     
     private List<CardScript> currentCardId = new();
 
@@ -60,12 +65,12 @@ public class GameManagerScript : MonoBehaviour
     private Vector3 TrashPlaceInit()
     {
         Rect safeArea =  SaveManager.Instance.safeArea;
-        Vector3 viewportPos = MainCamera.ScreenToViewportPoint(safeArea.position);
+        Vector3 viewportPos = Camera.main.ScreenToViewportPoint(safeArea.position);
 
-        Vector3 worldPos = MainCamera.ViewportToWorldPoint(new Vector3(viewportPos.x,0 ,viewportPos.y ));
+        Vector3 worldPos = Camera.main.ViewportToWorldPoint(new Vector3(viewportPos.x,0 ,viewportPos.y ));
 
-        Vector3 maxPos = MainCamera.ViewportToWorldPoint(
-            MainCamera.ScreenToViewportPoint(
+        Vector3 maxPos = Camera.main.ViewportToWorldPoint(
+            Camera.main.ScreenToViewportPoint(
                 new Vector3(
                     safeArea.xMax,
                     0,
@@ -74,19 +79,25 @@ public class GameManagerScript : MonoBehaviour
         float width = maxPos.x - worldPos.x;
         return new Vector3(worldPos.x+width/15f, 0, worldPos.z);
     }
+
+
     void Start()
      {
         BoardProtecter = GameObject.Find("BoardProtecter").GetComponent<MeshCollider>();
-        finalPoint.transform.position = TrashPlaceInit();
+        finalPoint = TrashPlaceInit();
+        
+        deckPlace = new Vector3(-finalPoint.x, finalPoint.y, finalPoint.z/2f);
+
+        
 
         
         isFool = false;
         textures = SaveManager.Instance.saveMaterial;
         CurrentGameMode = SaveManager.Instance.gameMode;
         CurrentGameMode.InitModeFitures();  
-        if (MainCamera)
+        if (Camera.main)
         {
-            Vector3 cameraCenter =  MainCamera.GetComponent<Camera>().transform.position;
+            Vector3 cameraCenter =  Camera.main.GetComponent<Camera>().transform.position;
             Debug.Log(cameraCenter.x+"Camera x");
             Vector2 cameraSize = new Vector2 (cameraCenter.x, cameraCenter.z);
             
@@ -128,6 +139,16 @@ public class GameManagerScript : MonoBehaviour
     }
 
   
+    public void MoveToDec(in CardScript[] poolCards, int activeCards)
+    {
+        for (int i = 0; i < activeCards; i++)
+        {
+
+            poolCards[i].StartRotation(0f);
+            poolCards[i].transform.position = deckPlace;
+            PoolManager.Instance.ReleaseCard(poolCards[i]);
+        }
+    }
 
     public void TakeAllCards(int count)
     {
@@ -185,12 +206,13 @@ public class GameManagerScript : MonoBehaviour
    
     public void GameModeRestart()
     {
+        StopAllCoroutines();
         scores = pairs = 0;
         for(int i =0; i < CurrentGameMode.SelectedCards; i++)
         {
             PoolManager.Instance.cardsList[i].StartRotation(0f);
         }
-        StopAllCoroutines();
+        
         CurrentGameMode.RestartGame();
     }
    
@@ -282,8 +304,8 @@ public class GameManagerScript : MonoBehaviour
         yield return new WaitForSeconds(waitingRate);
         //StopAllCoroutines();
         //CurrentGameMode.IsContinueValid();
-        SaveManager.Instance.saveProgressInstance.Save(total: scores, pairs: pairs);
         CurrentGameMode.EndScreen(ref scores ,ref scores,ref pairs,in endScreen);
+        SaveManager.Instance.saveProgressInstance.Save(total: scores, pairs: pairs);
 
     }
 
@@ -318,7 +340,7 @@ public class GameManagerScript : MonoBehaviour
 
         foreach (CardScript card in currentCardId) {
             //card.StartRotation(0f);
-            StartCoroutine(card.MoveToFinalPos(finalPoint.transform.position.x));
+            StartCoroutine(card.MoveToFinalPos(finalPoint.x));
             
             
         }
