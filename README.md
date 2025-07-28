@@ -10,5 +10,20 @@
 
 <img src="https://github.com/user-attachments/assets/294263a2-ac45-4137-9614-b27eb19c0a32" alt="CardGame GIF" width="600" />
 
+## *Summary*
+This is a pet project created with the Unity engine, specifically designed for Android devices.
+### Implemented features include:
+- Three game modes: Infinity, Basic, and Mistake
+- Loading screens and smooth scene transitions
+- Saving system to preserve player progress
+- Achievement system triggered by in-game events
+- Reward system: players receive new card sets as rewards for each achievement unlocked
+- Swipe adding mode for intuitive card selection and interaction
+- Responsive UI optimized for mobile devices
 
+### Not implemented features:
+- Audio: effects, background music
+- Levels and rogressive stages to increase challenge and variety.
+- Additional card sets: More diverse and themed card sets for rewards or customization are planned but not yet implemented
+- 
 [![Watch the gameplay video](https://img.youtube.com/vi/UCK7Kle86KE/hqdefault.jpg)](https://youtu.be/UCK7Kle86KE)
