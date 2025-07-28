@@ -25,5 +25,20 @@ This is a pet project created with the Unity engine, specifically designed for A
 - Audio: effects, background music
 - Levels and rogressive stages to increase challenge and variety.
 - Additional card sets: More diverse and themed card sets for rewards or customization are planned but not yet implemented
-- 
-[![Watch the gameplay video](https://img.youtube.com/vi/UCK7Kle86KE/hqdefault.jpg)](https://youtu.be/UCK7Kle86KE)
+## *Gameplay Media*
+
+<details>
+  <summary>Show gameplay videos and screenshots</summary>
+
+  ### Videos
+
+  [![Watch gameplay video](https://img.youtube.com/vi/UCK7Kle86KE/hqdefault.jpg)](https://youtu.be/UCK7Kle86KE)
+
+  ### Screenshots
+
+  <p align="center">
+    <img width="250" src="https://github.com/user-attachments/assets/7015921b-9cf4-46e8-932f-79202cb26804" alt="Screenshot 1" />&nbsp;&nbsp;&nbsp;&nbsp;
+    <img width="250" src="https://github.com/user-attachments/assets/2a181f10-b032-4358-867c-09471bd702d6" alt="Screenshot 2" />
+  </p>
+
+</details>
