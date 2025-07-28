@@ -37,10 +37,9 @@ This is a pet project created with the Unity engine, specifically designed for A
   ### Screenshots
 
   <p align="center">
-    <img width="250" alt="image" src="https://github.com/user-attachments/assets/c7cb02c9-9007-43f3-ba43-3e3ff490eaf5" />
-
-    <img width="250" alt="image" src="https://github.com/user-attachments/assets/ef26343f-25b6-45fc-9ab6-5d740ef93121" />
-    <img width="250" alt="image" src="https://github.com/user-attachments/assets/12c97d86-e3f3-402b-8c78-8611061cea0c" />
+    <img width="600" alt="image" src="https://github.com/user-attachments/assets/c7cb02c9-9007-43f3-ba43-3e3ff490eaf5" />
+    <img width="600" alt="image" src="https://github.com/user-attachments/assets/ef26343f-25b6-45fc-9ab6-5d740ef93121" />
+    <img width="600" alt="image" src="https://github.com/user-attachments/assets/12c97d86-e3f3-402b-8c78-8611061cea0c" />
 
 
   </p>
