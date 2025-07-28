@@ -55,3 +55,8 @@ Infinity mode allow to play endless round with same card pack. every turn possib
 Basic mode is a classic memory game with rounds and average scoring.
 Mistake mode introduces a mistake limit—you can make only 3 incorrect card selections. The goal is to achieve the highest score possible by remembering more cards without exceeding mistakes.
 
+### Swipe adding mode
+You can enhance any game mode with the swipe feature. Each time you make a mistake, a random pair of cards will swap positions, adding an extra layer of challenge and requiring greater attention. Joker can spaw its position too.
+
+### Joker card mode
+If an odd number of cards is selected, the Joker mode can be enabled. In this mode, a Joker card is added without a matching pair. The Joker remains on the board until the end of the round
