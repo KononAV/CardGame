@@ -8,6 +8,9 @@
 ![Blender](https://img.shields.io/badge/-Blender-E57928?style=flat-square&logo=blender&logoColor=white)
 ![Photoshop](https://img.shields.io/badge/-Photoshop-31A8FF?style=flat-square&logo=adobe-photoshop&logoColor=white) 
 
+<img width="600" alt="image" src= "https://github.com/user-attachments/assets/50e8a185-548d-416e-9563-199e24721f9e"/>
+
+
 <img src="https://github.com/user-attachments/assets/294263a2-ac45-4137-9614-b27eb19c0a32" alt="CardGame GIF" width="600" />
 
 ## *Summary*
